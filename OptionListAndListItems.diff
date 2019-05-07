@@ -1,0 +1,141 @@
+diff --git a/src/MGS.BoilerplateDemo.Core/BoilerplateDemo/OptionListsAndListItems/OptionList.cs b/src/MGS.BoilerplateDemo.Core/BoilerplateDemo/OptionListsAndListItems/OptionList.cs
+new file mode 100644
+index 0000000..d20aa67
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Core/BoilerplateDemo/OptionListsAndListItems/OptionList.cs
+@@ -0,0 +1,46 @@
++﻿using Abp.Domain.Entities;
++using Abp.Domain.Entities.Auditing;
++using System;
++using System.Collections.Generic;
++using System.ComponentModel;
++using System.ComponentModel.DataAnnotations;
++
++namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListsAndListItems
++{
++    public class OptionList : FullAuditedEntity, IPassivable, IMayHaveTenant
++    {
++        public const int MaxKeyLength = 128;
++        public const int MaxDescriptionLength = 256;
++        public const int MaxDisplayNameLength = 32;
++
++        [Required]
++        [MaxLength(MaxKeyLength)]
++        public string OptionListKey { get; set; }
++
++        [Required]
++        [MaxLength(MaxDisplayNameLength)]
++        public string DisplayName { get; set; }
++
++        [MaxLength(MaxDescriptionLength)]
++        public string Description { get; set; }
++
++        [Required]
++        [DefaultValue(true)]
++        public bool IsActive { get; set; }
++
++        public int? TenantId { get; set; }
++
++        public virtual IList<OptionListItem> OptionListItems { get; set; } = new List<OptionListItem>();
++
++        public void Update(OptionList input)
++        {
++            var updateTime = DateTime.Now;
++            OptionListKey = input.OptionListKey;
++            Description = input.Description;
++            DisplayName = input.DisplayName;
++            IsActive = input.IsActive;
++            IsDeleted = input.IsDeleted;
++            LastModificationTime = updateTime;
++        }
++    }
++}
+diff --git a/src/MGS.BoilerplateDemo.Core/BoilerplateDemo/OptionListsAndListItems/OptionListItem.cs b/src/MGS.BoilerplateDemo.Core/BoilerplateDemo/OptionListsAndListItems/OptionListItem.cs
+new file mode 100644
+index 0000000..cf59ae3
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Core/BoilerplateDemo/OptionListsAndListItems/OptionListItem.cs
+@@ -0,0 +1,37 @@
++﻿using Abp.Domain.Entities;
++using Abp.Domain.Entities.Auditing;
++using System.ComponentModel.DataAnnotations;
++
++namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListsAndListItems
++{
++    public class OptionListItem : FullAuditedEntity, IPassivable
++    {
++        public const int MaxItemDisplayTextLength = 32;
++        public const int MaxAdditionalInfoLength = 128;
++        public const int MinDisplayOrderValue = 1;
++        public const int MaxDisplayOrderValue = int.MaxValue;
++
++        public virtual OptionList OptionList { get; set; } = new OptionList();
++        public int OptionListId { get; set; }
++
++        [Required]
++        [MaxLength(MaxItemDisplayTextLength)]
++        public string DisplayText { get; set; }
++
++        [MaxLength(MaxAdditionalInfoLength)]
++        public string AdditionalInfo { get; set; }
++
++        [Range(MinDisplayOrderValue, MaxDisplayOrderValue)]
++        public int DisplayOrder { get; set; }
++
++        public bool IsActive { get; set; }
++
++        public void Update(OptionListItem item)
++        {
++            IsActive = item.IsActive;
++            DisplayText = item.DisplayText;
++            AdditionalInfo = item.AdditionalInfo;
++            DisplayOrder = item.DisplayOrder;
++        }
++    }
++}
+\ No newline at end of file
+diff --git a/src/MGS.BoilerplateDemo.Core/MGS.BoilerplateDemo.Core.csproj b/src/MGS.BoilerplateDemo.Core/MGS.BoilerplateDemo.Core.csproj
+index 12ac9ba..02fee62 100644
+--- a/src/MGS.BoilerplateDemo.Core/MGS.BoilerplateDemo.Core.csproj
++++ b/src/MGS.BoilerplateDemo.Core/MGS.BoilerplateDemo.Core.csproj
+@@ -1,4 +1,4 @@
+-<Project Sdk="Microsoft.NET.Sdk">
++﻿<Project Sdk="Microsoft.NET.Sdk">
+   <PropertyGroup>
+     <VersionPrefix>1.0.0.0</VersionPrefix>
+     <TargetFramework>netcoreapp2.2</TargetFramework>
+diff --git a/src/MGS.BoilerplateDemo.EntityFrameworkCore/EntityFrameworkCore/BoilerplateDemoDbContext.cs b/src/MGS.BoilerplateDemo.EntityFrameworkCore/EntityFrameworkCore/BoilerplateDemoDbContext.cs
+index 366763c..d0b512e 100644
+--- a/src/MGS.BoilerplateDemo.EntityFrameworkCore/EntityFrameworkCore/BoilerplateDemoDbContext.cs
++++ b/src/MGS.BoilerplateDemo.EntityFrameworkCore/EntityFrameworkCore/BoilerplateDemoDbContext.cs
+@@ -3,13 +3,16 @@ using Abp.Zero.EntityFrameworkCore;
+ using MGS.BoilerplateDemo.Authorization.Roles;
+ using MGS.BoilerplateDemo.Authorization.Users;
+ using MGS.BoilerplateDemo.MultiTenancy;
++using MGS.BoilerplateDemo.BoilerplateDemo.OptionListsAndListItems;
+ 
+ namespace MGS.BoilerplateDemo.EntityFrameworkCore
+ {
+     public class BoilerplateDemoDbContext : AbpZeroDbContext<Tenant, Role, User, BoilerplateDemoDbContext>
+     {
+         /* Define a DbSet for each entity of the application */
+-        
++        DbSet<OptionList> OptionLists { get; set; }
++        DbSet<OptionListItem> OptionListItems { get; set; }
++
+         public BoilerplateDemoDbContext(DbContextOptions<BoilerplateDemoDbContext> options)
+             : base(options)
+         {
+diff --git a/src/MGS.BoilerplateDemo.EntityFrameworkCore/MGS.BoilerplateDemo.EntityFrameworkCore.csproj b/src/MGS.BoilerplateDemo.EntityFrameworkCore/MGS.BoilerplateDemo.EntityFrameworkCore.csproj
+index 071c44d..0fc9a49 100644
+--- a/src/MGS.BoilerplateDemo.EntityFrameworkCore/MGS.BoilerplateDemo.EntityFrameworkCore.csproj
++++ b/src/MGS.BoilerplateDemo.EntityFrameworkCore/MGS.BoilerplateDemo.EntityFrameworkCore.csproj
+@@ -11,6 +11,8 @@
+     <Compile Remove="Migrations\20180726102624_Upgrade_ABP_380.cs" />
+     <Compile Remove="Migrations\20180927062408_test.cs" />
+     <Compile Remove="Migrations\20190111071724_Upgraded_To_Abp_v4_1_0.cs" />
++    <Compile Remove="Migrations\20190507051524_AddOptionListAndOptionListItemsEntities.cs" />
++    <Compile Remove="Migrations\20190507051524_AddOptionListAndOptionListItemsEntities.Designer.cs" />
+   </ItemGroup>
+   <ItemGroup>
+     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.1" />
