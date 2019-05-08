@@ -14,6 +14,7 @@ using MGS.BoilerplateDemo.EntityFrameworkCore;
 using MGS.BoilerplateDemo.EntityFrameworkCore.Seed.Host;
 using MGS.BoilerplateDemo.EntityFrameworkCore.Seed.Tenants;
 using MGS.BoilerplateDemo.MultiTenancy;
+using MGS.BoilerplateDemo.Tests.TestBuilders;
 
 namespace MGS.BoilerplateDemo.Tests
 {
@@ -43,6 +44,11 @@ namespace MGS.BoilerplateDemo.Tests
             {
                 NormalizeDbContext(context);
                 new TenantRoleAndUserBuilder(context, 1).Create();
+            });
+
+            UsingDbContext(context => {
+                NormalizeDbContext(context);
+                new TestListBuilder(context).Create();
             });
 
             LoginAsDefaultTenantAdmin();
