@@ -10,9 +10,12 @@ using Abp.Domain.Uow;
 using Abp.Application.Services;
 using MGS.BoilerplateDemo.BoilerplateDemo.OptionListsAndListItems;
 using MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems.Dtos;
+using Abp.Authorization;
+using MGS.BoilerplateDemo.Authorization;
 
 namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
 {
+    [AbpAuthorize(PermissionNames.Pages_OptionLists, PermissionNames.Pages_Tenants_OptionLists)]
     public class OptionListAppService : AsyncCrudAppService<OptionList, OptionListViewDto, int, GetOptionListDto, OptionListCreateOrEditDto, OptionListCreateOrEditDto>, IOptionListAppService
     {
         private IRepository<OptionList> _optionListRepository;
@@ -103,6 +106,8 @@ namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
+        [AbpAuthorize(PermissionNames.Pages_OptionLists_Create, PermissionNames.Pages_Tenants_OptionLists_Create
+                        , PermissionNames.Pages_OptionLists_Update, PermissionNames.Pages_Tenants_OptionListItems_Update)]
         public async Task CreateOrUpdateList(OptionListCreateOrEditDto input)
         {
             if (input.Id <= 0)
@@ -120,6 +125,7 @@ namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
+        [AbpAuthorize(PermissionNames.Pages_OptionLists_Create, PermissionNames.Pages_Tenants_OptionLists_Create)]
         private async Task CreateList(OptionListCreateOrEditDto input)
         {
             var entry = ObjectMapper.Map<OptionList>(input);
@@ -136,6 +142,7 @@ namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
+        [AbpAuthorize(PermissionNames.Pages_OptionLists_Update, PermissionNames.Pages_Tenants_OptionListItems_Update)]
         private async Task UpdateList(OptionListCreateOrEditDto input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
@@ -155,6 +162,7 @@ namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
+        [AbpAuthorize(PermissionNames.Pages_OptionLists_Delete, PermissionNames.Pages_Tenants_OptionLists_Delete)]
         public async Task DeleteListByEntity(EntityDto input)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
@@ -168,6 +176,7 @@ namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [AbpAuthorize(PermissionNames.Pages_OptionLists_Delete, PermissionNames.Pages_Tenants_OptionLists_Delete)]
         public async Task DeleteList(int id)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
@@ -176,6 +185,7 @@ namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
             }
         }
 
+        [AbpAuthorize(PermissionNames.Pages_OptionLists_Delete, PermissionNames.Pages_Tenants_OptionLists_Delete)]
         public async Task DeleteListItemsByList(string key)
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))

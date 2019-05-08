@@ -95,5 +95,29 @@
     <text name="Skins">Skins</text>
     <text name="Settings">Settings</text>
     <text name="Filter">Filter</text>
+    
+    <!-- Permissions -->
+    <text name="Pages">Base Level Pages</text>
+    <text name="Administration">Administration</text>
+    <!-- Option Lists-->
+    <text name="OptionListsAll">Global Lists</text>
+    <text name="OptionListsCreateAll">Create Global List</text>
+    <text name="OptionListsUpdateAll">Update Global List</text>
+    <text name="OptionListsDeleteAll">Delete Global List</text>
+
+    <text name="OptionListItemsAll">Global List Items</text>
+    <text name="OptionListItemsCreateAll">Create Global List Items</text>
+    <text name="OptionListItemsUpdateAll">Update Global List Items</text>
+    <text name="OptionListItemsDeleteAll">Delete Global List Items</text>
+
+    <text name="OptionLists">Local Lists</text>
+    <text name="OptionListsCreate">Create Local List</text>
+    <text name="OptionListsUpdate">Update Local List</text>
+    <text name="OptionListsDelete">Delete Local List</text>
+
+    <text name="OptionListItems">Local List Items</text>
+    <text name="OptionListItemsCreate">Create Local List Item</text>
+    <text name="OptionListItemsUpdate">Update Local List Item</text>
+    <text name="OptionListItemsDelete">Delete Local List Item</text>
   </texts>
 </localizationDictionary>
