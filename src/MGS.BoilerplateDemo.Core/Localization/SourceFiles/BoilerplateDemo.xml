@@ -98,7 +98,6 @@
     
     <!-- Permissions -->
     <text name="Pages">Base Level Pages</text>
-    <text name="Administration">Administration</text>
     <!-- Option Lists-->
     <text name="OptionListsAll">Global Lists</text>
     <text name="OptionListsCreateAll">Create Global List</text>
