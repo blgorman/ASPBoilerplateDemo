@@ -1,0 +1,637 @@
+diff --git a/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/Dtos/GetOptionListDto.cs b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/Dtos/GetOptionListDto.cs
+new file mode 100644
+index 0000000..6b114b9
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/Dtos/GetOptionListDto.cs
+@@ -0,0 +1,11 @@
++﻿using Abp.Application.Services.Dto;
++
++namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems.Dtos
++{
++    public class GetOptionListDto : PagedAndSortedResultRequestDto
++    {
++        public string Filter { get; set; }
++
++        public string Key { get; set; }
++    }
++}
+diff --git a/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/Dtos/GetOptionListItemDto.cs b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/Dtos/GetOptionListItemDto.cs
+new file mode 100644
+index 0000000..e40ec29
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/Dtos/GetOptionListItemDto.cs
+@@ -0,0 +1,11 @@
++﻿using Abp.Application.Services.Dto;
++
++namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems.Dtos
++{
++    public class GetOptionListItemDto : PagedAndSortedResultRequestDto
++    {
++        public string Filter { get; set; }
++
++        public string Key { get; set; }
++    }
++}
+diff --git a/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/Dtos/OptionListCreateOrEditDto.cs b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/Dtos/OptionListCreateOrEditDto.cs
+new file mode 100644
+index 0000000..3c625ed
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/Dtos/OptionListCreateOrEditDto.cs
+@@ -0,0 +1,31 @@
++﻿using Abp.Application.Services.Dto;
++using Abp.AutoMapper;
++using Abp.Domain.Entities;
++using MGS.BoilerplateDemo.BoilerplateDemo.OptionListsAndListItems;
++using System.Collections.Generic;
++using System.ComponentModel.DataAnnotations;
++
++namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems.Dtos
++{
++    [AutoMap(typeof(OptionList))]
++    public class OptionListCreateOrEditDto : EntityDto, IMayHaveTenant, IPassivable
++    {
++        public int? TenantId { get; set; }
++
++        [Required]
++        public bool IsActive { get; set; }
++
++        [Required]
++        [MaxLength(OptionList.MaxKeyLength)]
++        public string OptionListKey { get; set; }
++
++        [Required]
++        [MaxLength(OptionList.MaxDisplayNameLength)]
++        public string DisplayName { get; set; }
++
++        [MaxLength(OptionList.MaxDescriptionLength)]
++        public string Description { get; set; }
++
++        public List<OptionListItemViewDto> OptionListItems { get; set; }
++    }
++}
+diff --git a/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/Dtos/OptionListItemCreateOrEditDto.cs b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/Dtos/OptionListItemCreateOrEditDto.cs
+new file mode 100644
+index 0000000..c6d21a5
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/Dtos/OptionListItemCreateOrEditDto.cs
+@@ -0,0 +1,27 @@
++﻿using Abp.Application.Services.Dto;
++using Abp.AutoMapper;
++using Abp.Domain.Entities;
++using MGS.BoilerplateDemo.BoilerplateDemo.OptionListsAndListItems;
++using System.ComponentModel.DataAnnotations;
++
++namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems.Dtos
++{
++    [AutoMap(typeof(OptionListItem))]
++    public class OptionListItemCreateOrEditDto : EntityDto, IPassivable
++    {
++        [Required]
++        public int OptionListId { get; set; }
++
++        [Required]
++        [MaxLength(OptionListItem.MaxItemDisplayTextLength)]
++        public string DisplayText { get; set; }
++
++        [MaxLength(OptionListItem.MaxAdditionalInfoLength)]
++        public string AdditionalInfo { get; set; }
++
++        [Range(OptionListItem.MinDisplayOrderValue, OptionListItem.MaxDisplayOrderValue)]
++        public int DisplayOrder { get; set; }
++
++        public bool IsActive { get; set; }
++    }
++}
+diff --git a/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/Dtos/OptionListItemViewDto.cs b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/Dtos/OptionListItemViewDto.cs
+new file mode 100644
+index 0000000..41ee1ac
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/Dtos/OptionListItemViewDto.cs
+@@ -0,0 +1,30 @@
++﻿using Abp.Application.Services.Dto;
++using Abp.AutoMapper;
++using Abp.Domain.Entities;
++using MGS.BoilerplateDemo.BoilerplateDemo.OptionListsAndListItems;
++using Newtonsoft.Json;
++using System.ComponentModel.DataAnnotations;
++
++namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems.Dtos
++{
++    [AutoMap(typeof(OptionListItem))]
++    public class OptionListItemViewDto : FullAuditedEntityDto, IPassivable
++    {
++        public int OptionListId { get; set; }
++
++        [JsonIgnore]
++        public OptionListViewDto OptionList { get; set; } = new OptionListViewDto();
++
++        [Required]
++        [MaxLength(OptionListItem.MaxItemDisplayTextLength)]
++        public string DisplayText { get; set; }
++
++        [MaxLength(OptionListItem.MaxAdditionalInfoLength)]
++        public string AdditionalInfo { get; set; }
++
++        [Range(OptionListItem.MinDisplayOrderValue, OptionListItem.MaxDisplayOrderValue)]
++        public int DisplayOrder { get; set; }
++
++        public bool IsActive { get; set; }
++    }
++}
+diff --git a/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/Dtos/OptionListViewDto.cs b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/Dtos/OptionListViewDto.cs
+new file mode 100644
+index 0000000..d24ae97
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/Dtos/OptionListViewDto.cs
+@@ -0,0 +1,29 @@
++﻿using Abp.Application.Services.Dto;
++using Abp.AutoMapper;
++using MGS.BoilerplateDemo.BoilerplateDemo.OptionListsAndListItems;
++using System.Collections.Generic;
++using System.ComponentModel.DataAnnotations;
++
++namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems.Dtos
++{
++    [AutoMap(typeof(OptionList))]
++    public class OptionListViewDto : FullAuditedEntityDto
++    {
++        [Required]
++        [MaxLength(OptionList.MaxKeyLength)]
++        public string OptionListKey { get; set; }
++
++        [MaxLength(OptionList.MaxDisplayNameLength)]
++        public string DisplayName { get; set; }
++
++        [MaxLength(OptionList.MaxDescriptionLength)]
++        public string Description { get; set; }
++
++        [Required]
++        public bool IsActive { get; set; }
++
++        public int? TenantId { get; set; }
++
++        public IList<OptionListItemViewDto> OptionListItems { get; set; } = new List<OptionListItemViewDto>();
++    }
++}
+diff --git a/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/IOptionListAppService.cs b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/IOptionListAppService.cs
+new file mode 100644
+index 0000000..4d25e4e
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/IOptionListAppService.cs
+@@ -0,0 +1,28 @@
++﻿using Abp.Application.Services;
++using Abp.Application.Services.Dto;
++using MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems.Dtos;
++using System.Threading.Tasks;
++
++namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
++{
++    public interface IOptionListAppService : IAsyncCrudAppService<OptionListViewDto, int, GetOptionListDto, OptionListCreateOrEditDto, OptionListCreateOrEditDto>
++    {
++        //Get methods
++        Task<PagedResultDto<OptionListViewDto>> GetAllLists(GetOptionListDto input);
++
++        Task<OptionListViewDto> GetListByKey(GetOptionListDto input);
++
++        Task<OptionListViewDto> GetListByEntityId(EntityDto input);
++
++        Task<OptionListViewDto> GetListById(int id);
++
++        //Create/Update
++        Task CreateOrUpdateList(OptionListCreateOrEditDto input);
++
++        //Delete
++        Task DeleteListByEntity(EntityDto input);
++        Task DeleteList(int id);
++
++        Task DeleteListItemsByList(string key);
++    }
++}
+diff --git a/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/IOptionListItemsAppService.cs b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/IOptionListItemsAppService.cs
+new file mode 100644
+index 0000000..b4c0d36
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/IOptionListItemsAppService.cs
+@@ -0,0 +1,28 @@
++﻿using Abp.Application.Services;
++using Abp.Application.Services.Dto;
++using MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems.Dtos;
++using System.Threading.Tasks;
++
++namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
++{
++    public interface IOptionListItemsAppService : IAsyncCrudAppService<OptionListItemViewDto, int, GetOptionListItemDto, OptionListItemCreateOrEditDto, OptionListItemCreateOrEditDto>
++    {
++        //Get
++        //Get methods
++        Task<PagedResultDto<OptionListItemViewDto>> GetAllOptionListItems(GetOptionListItemDto input);
++
++        Task<PagedResultDto<OptionListItemViewDto>> GetListItemsByListKey(GetOptionListItemDto input);
++
++        Task<OptionListItemViewDto> GetListItemByEntityId(EntityDto input);
++
++        Task<OptionListItemViewDto> GetListItemById(int id);
++
++        //Create/Update
++        Task CreateOrUpdateListItem(OptionListItemCreateOrEditDto input);
++
++        //Delete
++        Task DeleteAllListItemsByListKey(string key);
++        Task DeleteListItemByEntity(EntityDto input);
++        Task DeleteListItem(int id);
++    }
++}
+diff --git a/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/OptionListAppService.cs b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/OptionListAppService.cs
+new file mode 100644
+index 0000000..6d433ce
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/OptionListAppService.cs
+@@ -0,0 +1,194 @@
++﻿using System;
++using System.Collections.Generic;
++using System.Threading.Tasks;
++using Microsoft.EntityFrameworkCore;
++using Abp.Collections.Extensions;
++using Abp.Domain.Repositories;
++using Abp.Linq.Extensions;
++using Abp.Application.Services.Dto;
++using Abp.Domain.Uow;
++using Abp.Application.Services;
++using MGS.BoilerplateDemo.BoilerplateDemo.OptionListsAndListItems;
++using MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems.Dtos;
++
++namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
++{
++    public class OptionListAppService : AsyncCrudAppService<OptionList, OptionListViewDto, int, GetOptionListDto, OptionListCreateOrEditDto, OptionListCreateOrEditDto>, IOptionListAppService
++    {
++        private IRepository<OptionList> _optionListRepository;
++
++        public OptionListAppService(IRepository<OptionList> optionListRepository) : base(optionListRepository)
++        {
++            _optionListRepository = optionListRepository;
++        }
++
++        /// <summary>
++        /// Get all Lists by filter or all
++        /// </summary>
++        /// <param name="input"></param>
++        /// <returns></returns>
++        public async Task<PagedResultDto<OptionListViewDto>> GetAllLists(GetOptionListDto input)
++        {
++            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
++            {
++                var tenantId = AbpSession.TenantId;  //is null if on host
++
++                var filteredResults = await _optionListRepository.GetAll()
++                                                //.Include(x => x.OptionListItems)
++                                                .WhereIf(!string.IsNullOrWhiteSpace(input.Filter), ol =>
++                                                            (ol.OptionListKey != null && ol.OptionListKey.Equals(input.Filter
++                                                                                    , StringComparison.CurrentCultureIgnoreCase))
++                                                            || (ol.DisplayName != null && ol.DisplayName.Equals(input.Filter
++                                                                                    , StringComparison.CurrentCultureIgnoreCase))
++                                                            || (ol.Description != null && ol.Description.Equals(input.Filter
++                                                                                    , StringComparison.CurrentCultureIgnoreCase))
++                                                        )
++                                                .WhereIf(tenantId != null, x => x.TenantId == tenantId)
++                                                .WhereIf(tenantId == null, x => x.TenantId == null).ToListAsync();
++
++                var results = ObjectMapper.Map<List<OptionListViewDto>>(filteredResults);
++
++                return new PagedResultDto<OptionListViewDto>(
++                        results.Count
++                        , results
++                );
++            }
++        }
++
++        /// <summary>
++        /// Get List By Id
++        /// </summary>
++        /// <param name="input"></param>
++        /// <returns></returns>
++        public async Task<OptionListViewDto> GetListByEntityId(EntityDto input)
++        {
++            return await GetListById(input.Id);
++        }
++
++        /// <summary>
++        /// Get a list by Id
++        /// </summary>
++        /// <param name="id"></param>
++        /// <returns></returns>
++        public async Task<OptionListViewDto> GetListById(int id)
++        {
++            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
++            {
++                var result = await _optionListRepository.GetAllIncluding(x => x.OptionListItems).FirstOrDefaultAsync(x => x.Id == id);
++                return ObjectMapper.Map<OptionListViewDto>(result);
++            }
++        }
++
++        /// <summary>
++        /// Get a specific List by Key
++        /// </summary>
++        /// <param name="input"></param>
++        /// <returns></returns>
++        public async Task<OptionListViewDto> GetListByKey(GetOptionListDto input)
++        {
++            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
++            {
++                if (string.IsNullOrWhiteSpace(input.Key)) return null;
++
++                var match = await _optionListRepository
++                                        .GetAllIncluding(x => x.OptionListItems)
++                                        .FirstOrDefaultAsync(x => x.OptionListKey.Equals(input.Key, StringComparison.CurrentCultureIgnoreCase));
++
++                return ObjectMapper.Map<OptionListViewDto>(match);
++            }
++        }
++
++        /// <summary>
++        /// Create or Update a list
++        /// </summary>
++        /// <param name="input"></param>
++        /// <returns></returns>
++        public async Task CreateOrUpdateList(OptionListCreateOrEditDto input)
++        {
++            if (input.Id <= 0)
++            {
++                await CreateList(input);
++            }
++            else
++            {
++                await UpdateList(input);
++            }
++        }
++
++        /// <summary>
++        /// Create a new list
++        /// </summary>
++        /// <param name="input"></param>
++        /// <returns></returns>
++        private async Task CreateList(OptionListCreateOrEditDto input)
++        {
++            var entry = ObjectMapper.Map<OptionList>(input);
++            entry.TenantId = AbpSession.TenantId;  //null if on host, otherwise is tenant specific
++
++            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
++            {
++                await _optionListRepository.InsertAsync(entry);
++            }
++        }
++
++        /// <summary>
++        /// Update a list
++        /// </summary>
++        /// <param name="input"></param>
++        /// <returns></returns>
++        private async Task UpdateList(OptionListCreateOrEditDto input)
++        {
++            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
++            {
++                var entry = await _optionListRepository.FirstOrDefaultAsync(x => x.Id == input.Id);
++                entry.TenantId = AbpSession.TenantId;  //null if on host, otherwise is tenant specific probably not nec on update.
++
++                if (entry != null)
++                {
++                    ObjectMapper.Map(input, entry);
++                }
++            }
++        }
++
++        /// <summary>
++        /// Delete a list by Entity Dto
++        /// </summary>
++        /// <param name="input"></param>
++        /// <returns></returns>
++        public async Task DeleteListByEntity(EntityDto input)
++        {
++            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
++            {
++                await DeleteList(input.Id);
++            }
++        }
++
++        /// <summary>
++        /// Delete a list by Id
++        /// </summary>
++        /// <param name="id"></param>
++        /// <returns></returns>
++        public async Task DeleteList(int id)
++        {
++            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
++            {
++                await _optionListRepository.DeleteAsync(x => x.Id == id);
++            }
++        }
++
++        public async Task DeleteListItemsByList(string key)
++        {
++            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
++            {
++                var match = await _optionListRepository
++                                .GetAllIncluding(x => x.OptionListItems)
++                                .FirstOrDefaultAsync(x => x.OptionListKey.Equals(key, StringComparison.CurrentCultureIgnoreCase));
++
++                if (match != null)
++                {
++                    match.OptionListItems = new List<OptionListItem>();
++                }
++            }
++        }
++    }
++}
+diff --git a/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/OptionListItemsAppService.cs b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/OptionListItemsAppService.cs
+new file mode 100644
+index 0000000..7500f31
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/OptionListItemsAppService.cs
+@@ -0,0 +1,178 @@
++﻿using System;
++using System.Threading.Tasks;
++using System.Collections.Generic;
++using Microsoft.EntityFrameworkCore;
++using Abp.Application.Services.Dto;
++using Abp.Domain.Repositories;
++using Abp.Collections.Extensions;
++using Abp.Linq.Extensions;
++using Abp.Domain.Uow;
++using System.Linq;
++using Abp.Application.Services;
++using MGS.BoilerplateDemo.BoilerplateDemo.OptionListsAndListItems;
++using MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems.Dtos;
++
++namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
++{
++    public class OptionListItemsAppService : AsyncCrudAppService<OptionListItem, OptionListItemViewDto, int, GetOptionListItemDto, OptionListItemCreateOrEditDto, OptionListItemCreateOrEditDto>, IOptionListItemsAppService
++    {
++        private IOptionListAppService _optionListAppService;
++        private IRepository<OptionListItem> _optionListItemRepository;
++
++        public OptionListItemsAppService(IOptionListAppService optionListAppService,
++                                            IRepository<OptionListItem> optionListItemRepository) : base(optionListItemRepository)
++        {
++            _optionListAppService = optionListAppService;
++            _optionListItemRepository = optionListItemRepository;
++        }
++
++        /// <summary>
++        /// Get All List Items by filter or list key
++        /// </summary>
++        /// <param name="input"></param>
++        /// <returns></returns>
++        public async Task<PagedResultDto<OptionListItemViewDto>> GetAllOptionListItems(GetOptionListItemDto input)
++        {
++            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
++            {
++                //limit to the tenant or the host, but don't show both:
++                var tenantId = AbpSession.TenantId; //is null if on host
++
++                var filteredResults = await _optionListItemRepository.GetAll()
++                                                    //.Include(x => x.OptionList)
++                                                    .WhereIf(!string.IsNullOrWhiteSpace(input.Filter),
++                                                        oli => oli.DisplayText != null && oli.DisplayText.Contains(input.Filter
++                                                                    , StringComparison.CurrentCultureIgnoreCase)
++                                                        || oli.AdditionalInfo != null && oli.AdditionalInfo.Contains(input.Filter
++                                                                        , StringComparison.CurrentCultureIgnoreCase))
++                                                    .WhereIf(tenantId != null, x => x.OptionList.TenantId == tenantId)
++                                                    .WhereIf(tenantId == null, x => x.OptionList.TenantId == null).ToListAsync();
++                var results = ObjectMapper.Map<List<OptionListItemViewDto>>(filteredResults);
++                return new PagedResultDto<OptionListItemViewDto>(
++                        results.Count,
++                        results
++                    );
++            }
++        }
++
++        public async Task<OptionListItemViewDto> GetListItemByEntityId(EntityDto input)
++        {
++            return await GetListItemById(input.Id);
++        }
++
++        public async Task<OptionListItemViewDto> GetListItemById(int id)
++        {
++            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
++            {
++                var result = await _optionListItemRepository.FirstOrDefaultAsync(x => x.Id == id);
++                return ObjectMapper.Map<OptionListItemViewDto>(result);
++            }
++        }
++
++        private async Task<OptionListViewDto> GetFirstMatchingOptionListByKey(GetOptionListDto input)
++        {
++            if (string.IsNullOrEmpty(input.Key)) return null;
++            return await _optionListAppService.GetListByKey(input);
++        }
++
++        public async Task<PagedResultDto<OptionListItemViewDto>> GetListItemsByListKey(GetOptionListItemDto input)
++        {
++            //here we don't want to limit: I need to see list items in a dropdown
++            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
++            {
++                if (string.IsNullOrEmpty(input.Key) && string.IsNullOrEmpty(input.Filter)) return new PagedResultDto<OptionListItemViewDto>(0
++                            , new List<OptionListItemViewDto>());
++
++                var theList = await GetFirstMatchingOptionListByKey(new GetOptionListDto() { Key = input.Key });
++
++                if (theList != null && theList.OptionListItems != null && theList.OptionListItems.Any())
++                {
++                    var results = ObjectMapper.Map<List<OptionListItemViewDto>>(theList.OptionListItems);
++                    return new PagedResultDto<OptionListItemViewDto>(
++                            results.Count
++                            , results
++                    );
++                }
++
++                //return empty results:
++                return new PagedResultDto<OptionListItemViewDto>(0
++                            , new List<OptionListItemViewDto>());
++            }
++        }
++
++        public async Task CreateOrUpdateListItem(OptionListItemCreateOrEditDto input)
++        {
++            if (input.Id <= 0)
++            {
++                await CreateListItem(input);
++            }
++            else
++            {
++                await UpdateListItem(input);
++            }
++        }
++
++        private async Task CreateListItem(OptionListItemCreateOrEditDto input)
++        {
++            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
++            {
++                var entry = ObjectMapper.Map<OptionListItem>(input);
++
++                var list = await _optionListAppService.GetListById(input.OptionListId);
++                if (list.OptionListItems.Any())
++                {
++                    foreach (var oli in list.OptionListItems)
++                    {
++                        if (oli.DisplayText.Equals(input.DisplayText, StringComparison.CurrentCultureIgnoreCase))
++                        {
++                            throw new Exception("List already contains entry - no list item created");
++                        }
++                    }
++                }
++
++                var theList = ObjectMapper.Map<OptionList>(list);
++                entry.OptionList = theList;
++                await _optionListItemRepository.InsertAsync(entry);
++
++                theList.OptionListItems.Add(entry);
++            }
++        }
++
++        private async Task UpdateListItem(OptionListItemCreateOrEditDto input)
++        {
++            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
++            {
++                var entry = await _optionListItemRepository.FirstOrDefaultAsync(x => x.Id == input.Id);
++                if (entry != null)
++                {
++                    ObjectMapper.Map(input, entry);
++                }
++            }
++        }
++
++        public async Task DeleteAllListItemsByListKey(string key)
++        {
++            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
++            {
++                await _optionListAppService.DeleteListItemsByList(key);
++            }
++        }
++
++        public async Task DeleteListItemByEntity(EntityDto input)
++        {
++            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
++            {
++                await DeleteListItem(input.Id);
++            }
++        }
++
++        public async Task DeleteListItem(int id)
++        {
++            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
++            {
++                await _optionListItemRepository.DeleteAsync(x => x.Id == id);
++            }
++        }
++
++    }
++}
+diff --git a/src/MGS.BoilerplateDemo.Application/MGS.BoilerplateDemo.Application.csproj b/src/MGS.BoilerplateDemo.Application/MGS.BoilerplateDemo.Application.csproj
+index c4ea6ee..0fb4d79 100644
+--- a/src/MGS.BoilerplateDemo.Application/MGS.BoilerplateDemo.Application.csproj
++++ b/src/MGS.BoilerplateDemo.Application/MGS.BoilerplateDemo.Application.csproj
+@@ -1,4 +1,4 @@
+-<Project Sdk="Microsoft.NET.Sdk">
++﻿<Project Sdk="Microsoft.NET.Sdk">
+   <PropertyGroup>
+     <VersionPrefix>1.0.0.0</VersionPrefix>
+     <TargetFramework>netcoreapp2.2</TargetFramework>
