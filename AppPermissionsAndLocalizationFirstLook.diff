@@ -1,478 +1,255 @@
-diff --git a/src/MGS.BoilerplateDemo.EntityFrameworkCore/EntityFrameworkCore/BoilerplateDemoDbContext.cs b/src/MGS.BoilerplateDemo.EntityFrameworkCore/EntityFrameworkCore/BoilerplateDemoDbContext.cs
-index d0b512e..58d25e1 100644
---- a/src/MGS.BoilerplateDemo.EntityFrameworkCore/EntityFrameworkCore/BoilerplateDemoDbContext.cs
-+++ b/src/MGS.BoilerplateDemo.EntityFrameworkCore/EntityFrameworkCore/BoilerplateDemoDbContext.cs
-@@ -10,8 +10,8 @@ namespace MGS.BoilerplateDemo.EntityFrameworkCore
-     public class BoilerplateDemoDbContext : AbpZeroDbContext<Tenant, Role, User, BoilerplateDemoDbContext>
-     {
-         /* Define a DbSet for each entity of the application */
--        DbSet<OptionList> OptionLists { get; set; }
--        DbSet<OptionListItem> OptionListItems { get; set; }
-+        public virtual DbSet<OptionList> OptionLists { get; set; }
-+        public virtual DbSet<OptionListItem> OptionListItems { get; set; }
+diff --git a/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/OptionListAppService.cs b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/OptionListAppService.cs
+index 6d433ce..dc45c2f 100644
+--- a/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/OptionListAppService.cs
++++ b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/OptionListAppService.cs
+@@ -10,9 +10,12 @@ using Abp.Domain.Uow;
+ using Abp.Application.Services;
+ using MGS.BoilerplateDemo.BoilerplateDemo.OptionListsAndListItems;
+ using MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems.Dtos;
++using Abp.Authorization;
++using MGS.BoilerplateDemo.Authorization;
  
-         public BoilerplateDemoDbContext(DbContextOptions<BoilerplateDemoDbContext> options)
-             : base(options)
-diff --git a/test/MGS.BoilerplateDemo.Tests/BoilerplateDemoTestBase.cs b/test/MGS.BoilerplateDemo.Tests/BoilerplateDemoTestBase.cs
-index a8136f3..8733d9a 100644
---- a/test/MGS.BoilerplateDemo.Tests/BoilerplateDemoTestBase.cs
-+++ b/test/MGS.BoilerplateDemo.Tests/BoilerplateDemoTestBase.cs
-@@ -14,6 +14,7 @@ using MGS.BoilerplateDemo.EntityFrameworkCore;
- using MGS.BoilerplateDemo.EntityFrameworkCore.Seed.Host;
- using MGS.BoilerplateDemo.EntityFrameworkCore.Seed.Tenants;
- using MGS.BoilerplateDemo.MultiTenancy;
-+using MGS.BoilerplateDemo.Tests.TestBuilders;
- 
- namespace MGS.BoilerplateDemo.Tests
+ namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
  {
-@@ -45,6 +46,11 @@ namespace MGS.BoilerplateDemo.Tests
-                 new TenantRoleAndUserBuilder(context, 1).Create();
-             });
- 
-+            UsingDbContext(context => {
-+                NormalizeDbContext(context);
-+                new TestListBuilder(context).Create();
-+            });
-+
-             LoginAsDefaultTenantAdmin();
++    [AbpAuthorize(PermissionNames.Pages_OptionLists, PermissionNames.Pages_Tenants_OptionLists)]
+     public class OptionListAppService : AsyncCrudAppService<OptionList, OptionListViewDto, int, GetOptionListDto, OptionListCreateOrEditDto, OptionListCreateOrEditDto>, IOptionListAppService
+     {
+         private IRepository<OptionList> _optionListRepository;
+@@ -103,6 +106,8 @@ namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
+         /// </summary>
+         /// <param name="input"></param>
+         /// <returns></returns>
++        [AbpAuthorize(PermissionNames.Pages_OptionLists_Create, PermissionNames.Pages_Tenants_OptionLists_Create
++                        , PermissionNames.Pages_OptionLists_Update, PermissionNames.Pages_Tenants_OptionListItems_Update)]
+         public async Task CreateOrUpdateList(OptionListCreateOrEditDto input)
+         {
+             if (input.Id <= 0)
+@@ -120,6 +125,7 @@ namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
+         /// </summary>
+         /// <param name="input"></param>
+         /// <returns></returns>
++        [AbpAuthorize(PermissionNames.Pages_OptionLists_Create, PermissionNames.Pages_Tenants_OptionLists_Create)]
+         private async Task CreateList(OptionListCreateOrEditDto input)
+         {
+             var entry = ObjectMapper.Map<OptionList>(input);
+@@ -136,6 +142,7 @@ namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
+         /// </summary>
+         /// <param name="input"></param>
+         /// <returns></returns>
++        [AbpAuthorize(PermissionNames.Pages_OptionLists_Update, PermissionNames.Pages_Tenants_OptionListItems_Update)]
+         private async Task UpdateList(OptionListCreateOrEditDto input)
+         {
+             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
+@@ -155,6 +162,7 @@ namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
+         /// </summary>
+         /// <param name="input"></param>
+         /// <returns></returns>
++        [AbpAuthorize(PermissionNames.Pages_OptionLists_Delete, PermissionNames.Pages_Tenants_OptionLists_Delete)]
+         public async Task DeleteListByEntity(EntityDto input)
+         {
+             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
+@@ -168,6 +176,7 @@ namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
+         /// </summary>
+         /// <param name="id"></param>
+         /// <returns></returns>
++        [AbpAuthorize(PermissionNames.Pages_OptionLists_Delete, PermissionNames.Pages_Tenants_OptionLists_Delete)]
+         public async Task DeleteList(int id)
+         {
+             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
+@@ -176,6 +185,7 @@ namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
+             }
          }
  
-diff --git a/test/MGS.BoilerplateDemo.Tests/MGS.BoilerplateDemo.Tests.csproj b/test/MGS.BoilerplateDemo.Tests/MGS.BoilerplateDemo.Tests.csproj
-index db6e85b..ecce9ea 100644
---- a/test/MGS.BoilerplateDemo.Tests/MGS.BoilerplateDemo.Tests.csproj
-+++ b/test/MGS.BoilerplateDemo.Tests/MGS.BoilerplateDemo.Tests.csproj
-@@ -1,4 +1,4 @@
--<Project Sdk="Microsoft.NET.Sdk">
-+﻿<Project Sdk="Microsoft.NET.Sdk">
-   <PropertyGroup>
-     <VersionPrefix>1.0.0.0</VersionPrefix>
-     <TargetFramework>netcoreapp2.2</TargetFramework>
-diff --git a/test/MGS.BoilerplateDemo.Tests/OptionListAndListItems/OptionListItemsTest.cs b/test/MGS.BoilerplateDemo.Tests/OptionListAndListItems/OptionListItemsTest.cs
-new file mode 100644
-index 0000000..9e39353
---- /dev/null
-+++ b/test/MGS.BoilerplateDemo.Tests/OptionListAndListItems/OptionListItemsTest.cs
-@@ -0,0 +1,302 @@
-+﻿using Abp.Application.Services.Dto;
-+using MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems;
-+using MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems.Dtos;
-+using Microsoft.EntityFrameworkCore;
-+using Shouldly;
-+using Xunit;
-+using System;
-+using System.Linq;
-+using System.Threading.Tasks;
++        [AbpAuthorize(PermissionNames.Pages_OptionLists_Delete, PermissionNames.Pages_Tenants_OptionLists_Delete)]
+         public async Task DeleteListItemsByList(string key)
+         {
+             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
+diff --git a/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/OptionListItemsAppService.cs b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/OptionListItemsAppService.cs
+index 7500f31..10e16ab 100644
+--- a/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/OptionListItemsAppService.cs
++++ b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/OptionListItemsAppService.cs
+@@ -11,9 +11,12 @@ using System.Linq;
+ using Abp.Application.Services;
+ using MGS.BoilerplateDemo.BoilerplateDemo.OptionListsAndListItems;
+ using MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems.Dtos;
++using Abp.Authorization;
++using MGS.BoilerplateDemo.Authorization;
+ 
+ namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
+ {
++    [AbpAuthorize(PermissionNames.Pages_OptionListItems, PermissionNames.Pages_Tenants_OptionListItems)]
+     public class OptionListItemsAppService : AsyncCrudAppService<OptionListItem, OptionListItemViewDto, int, GetOptionListItemDto, OptionListItemCreateOrEditDto, OptionListItemCreateOrEditDto>, IOptionListItemsAppService
+     {
+         private IOptionListAppService _optionListAppService;
+@@ -100,6 +103,8 @@ namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
+             }
+         }
+ 
++        [AbpAuthorize(PermissionNames.Pages_OptionListItems_Create, PermissionNames.Pages_Tenants_OptionListItems_Create,
++                        PermissionNames.Pages_OptionListItems_Update, PermissionNames.Pages_Tenants_OptionListItems_Update)]
+         public async Task CreateOrUpdateListItem(OptionListItemCreateOrEditDto input)
+         {
+             if (input.Id <= 0)
+@@ -112,6 +117,7 @@ namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
+             }
+         }
+ 
++        [AbpAuthorize(PermissionNames.Pages_OptionListItems_Create, PermissionNames.Pages_Tenants_OptionListItems_Create)]
+         private async Task CreateListItem(OptionListItemCreateOrEditDto input)
+         {
+             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
+@@ -138,6 +144,7 @@ namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
+             }
+         }
+ 
++        [AbpAuthorize(PermissionNames.Pages_OptionListItems_Update, PermissionNames.Pages_Tenants_OptionListItems_Update)]
+         private async Task UpdateListItem(OptionListItemCreateOrEditDto input)
+         {
+             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
+@@ -150,6 +157,7 @@ namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
+             }
+         }
+ 
++        [AbpAuthorize(PermissionNames.Pages_OptionListItems_Delete, PermissionNames.Pages_Tenants_OptionListItems_Delete)]
+         public async Task DeleteAllListItemsByListKey(string key)
+         {
+             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
+@@ -158,6 +166,7 @@ namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
+             }
+         }
+ 
++        [AbpAuthorize(PermissionNames.Pages_OptionListItems_Delete, PermissionNames.Pages_Tenants_OptionListItems_Delete)]
+         public async Task DeleteListItemByEntity(EntityDto input)
+         {
+             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
+@@ -166,6 +175,7 @@ namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
+             }
+         }
+ 
++        [AbpAuthorize(PermissionNames.Pages_OptionListItems_Delete, PermissionNames.Pages_Tenants_OptionListItems_Delete)]
+         public async Task DeleteListItem(int id)
+         {
+             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant, AbpDataFilters.MustHaveTenant))
+@@ -173,6 +183,5 @@ namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
+                 await _optionListItemRepository.DeleteAsync(x => x.Id == id);
+             }
+         }
+-
+     }
+ }
+diff --git a/src/MGS.BoilerplateDemo.Core/Authorization/BoilerplateDemoAuthorizationProvider.cs b/src/MGS.BoilerplateDemo.Core/Authorization/BoilerplateDemoAuthorizationProvider.cs
+index 225755d..9f706b5 100644
+--- a/src/MGS.BoilerplateDemo.Core/Authorization/BoilerplateDemoAuthorizationProvider.cs
++++ b/src/MGS.BoilerplateDemo.Core/Authorization/BoilerplateDemoAuthorizationProvider.cs
+@@ -8,9 +8,34 @@ namespace MGS.BoilerplateDemo.Authorization
+     {
+         public override void SetPermissions(IPermissionDefinitionContext context)
+         {
++            var pages = context.GetPermissionOrNull(PermissionNames.Pages) ?? context.CreatePermission(PermissionNames.Pages, L("Pages"));
++            var administration = context.GetPermissionOrNull(PermissionNames.Administration) ?? context.CreatePermission(PermissionNames.Administration, L("Administration"), multiTenancySides: MultiTenancySides.Host);
++            var administrationOnTenant = context.GetPermissionOrNull(PermissionNames.AdministrationOnTenant) ?? context.CreatePermission(PermissionNames.AdministrationOnTenant, L("Administration"), multiTenancySides: MultiTenancySides.Tenant);
 +
-+namespace MGS.BoilerplateDemo.Tests.OptionListAndListItems
-+{
-+    public class OptionListItemsTest : BoilerplateDemoTestBase
-+    {
+             context.CreatePermission(PermissionNames.Pages_Users, L("Users"));
+             context.CreatePermission(PermissionNames.Pages_Roles, L("Roles"));
+             context.CreatePermission(PermissionNames.Pages_Tenants, L("Tenants"), multiTenancySides: MultiTenancySides.Host);
 +
-+        IOptionListAppService _optionListService;
-+        IOptionListItemsAppService _optionListItemService;
++            var hostOptionLists = pages.CreateChildPermission(PermissionNames.Pages_Tenants_OptionLists, L("OptionListsAll"), multiTenancySides: MultiTenancySides.Host);
++            hostOptionLists.CreateChildPermission(PermissionNames.Pages_Tenants_OptionLists_Create, L("OptionListsCreateAll"), multiTenancySides: MultiTenancySides.Host);
++            hostOptionLists.CreateChildPermission(PermissionNames.Pages_Tenants_OptionLists_Update, L("OptionListsUpdateAll"), multiTenancySides: MultiTenancySides.Host);
++            hostOptionLists.CreateChildPermission(PermissionNames.Pages_Tenants_OptionLists_Delete, L("OptionListsDeleteAll"), multiTenancySides: MultiTenancySides.Host);
 +
-+        public OptionListItemsTest()
-+        {
-+            LoginAsHostAdmin();
-+            _optionListService = Resolve<IOptionListAppService>();
-+            _optionListItemService = Resolve<IOptionListItemsAppService>();
-+        }
++            var hostOptionListItems = pages.CreateChildPermission(PermissionNames.Pages_Tenants_OptionListItems, L("OptionListItemsAll"), multiTenancySides: MultiTenancySides.Host);
++            hostOptionListItems.CreateChildPermission(PermissionNames.Pages_Tenants_OptionListItems_Create, L("OptionListItemsCreateAll"), multiTenancySides: MultiTenancySides.Host);
++            hostOptionListItems.CreateChildPermission(PermissionNames.Pages_Tenants_OptionListItems_Update, L("OptionListItemsUpdateAll"), multiTenancySides: MultiTenancySides.Host);
++            hostOptionListItems.CreateChildPermission(PermissionNames.Pages_Tenants_OptionListItems_Delete, L("OptionListItemsDeleteAll"), multiTenancySides: MultiTenancySides.Host);
 +
-+        //GetAll by filter
-+        [Theory]
-+        [InlineData("asdf", 0)]
-+        [InlineData("AL", 1)]
-+        [InlineData("Iowa", 1)]
-+        [InlineData("Oran", 1)]
-+        [InlineData("", 5)]
-+        public async Task TestGetAllByFilter(string filter, int expectedCount)
-+        {
-+            //arrange
-+            var input = new GetOptionListItemDto()
-+            {
-+                Filter = filter
-+            };
++            var tenantOptionLists = pages.CreateChildPermission(PermissionNames.Pages_OptionLists, L("OptionLists"), multiTenancySides: MultiTenancySides.Tenant);
++            tenantOptionLists.CreateChildPermission(PermissionNames.Pages_OptionLists_Create, L("OptionListsCreate"), multiTenancySides: MultiTenancySides.Tenant);
++            tenantOptionLists.CreateChildPermission(PermissionNames.Pages_OptionLists_Update, L("OptionListsUpdate"), multiTenancySides: MultiTenancySides.Tenant);
++            tenantOptionLists.CreateChildPermission(PermissionNames.Pages_OptionLists_Delete, L("OptionListsDelete"), multiTenancySides: MultiTenancySides.Tenant);
 +
-+            //act
-+            var results = await _optionListItemService.GetAllOptionListItems(input);
++            var tenantOptionListItems = pages.CreateChildPermission(PermissionNames.Pages_OptionListItems, L("OptionListItems"), multiTenancySides: MultiTenancySides.Tenant);
++            tenantOptionListItems.CreateChildPermission(PermissionNames.Pages_OptionListItems_Create, L("OptionListItemsCreate"), multiTenancySides: MultiTenancySides.Tenant);
++            tenantOptionListItems.CreateChildPermission(PermissionNames.Pages_OptionListItems_Update, L("OptionListItemsUpdate"), multiTenancySides: MultiTenancySides.Tenant);
++            tenantOptionListItems.CreateChildPermission(PermissionNames.Pages_OptionListItems_Delete, L("OptionListItemsDelete"), multiTenancySides: MultiTenancySides.Tenant);
 +
-+            //assert
-+            results.ShouldNotBeNull();
-+            results.Items.Count.ShouldBe(expectedCount);
-+        }
+         }
+ 
+         private static ILocalizableString L(string name)
+diff --git a/src/MGS.BoilerplateDemo.Core/Authorization/PermissionNames.cs b/src/MGS.BoilerplateDemo.Core/Authorization/PermissionNames.cs
+index b66cf7d..ce2f906 100644
+--- a/src/MGS.BoilerplateDemo.Core/Authorization/PermissionNames.cs
++++ b/src/MGS.BoilerplateDemo.Core/Authorization/PermissionNames.cs
+@@ -2,10 +2,38 @@
+ {
+     public static class PermissionNames
+     {
++        public const string Pages = "Pages";
++        public const string Administration = "Administration";
++        public const string AdministrationOnTenant = "AdministrationOnTenant";
 +
-+        //GetListItemByIdEntityDto
-+        [Theory]
-+        [InlineData(1, 1)]
-+        [InlineData(2, 2)]
-+        [InlineData(0, 0)]
-+        [InlineData(-1, 0)]
-+        [InlineData(9876, 0)]
-+        public async Task TestGetListItemByIdEntityDto(int id, int expectedId)
-+        {
-+            //arrange
-+            var input = new EntityDto()
-+            {
-+                Id = id
-+            };
+         public const string Pages_Tenants = "Pages.Tenants";
+ 
+         public const string Pages_Users = "Pages.Users";
+ 
+         public const string Pages_Roles = "Pages.Roles";
 +
-+            //act
-+            var result = await _optionListItemService.GetListItemByEntityId(input);
++        //OptionLists -> Tenants
++        public const string Pages_Tenants_OptionLists = "Pages.Tenants.OptionLists";
++        public const string Pages_Tenants_OptionLists_Create = "Pages.Tenants.OptionLists.Create";
++        public const string Pages_Tenants_OptionLists_Update = "Pages.Tenants.OptionLists.Update";
++        public const string Pages_Tenants_OptionLists_Delete = "Pages.Tenants.OptionLists.Delete";
 +
-+            //assert
-+            if (expectedId <= 0 || expectedId > 9800)
-+            {
-+                result.ShouldBeNull();
-+            }
-+            else
-+            {
-+                result.ShouldNotBeNull();
-+                result.Id.ShouldBe(expectedId);
-+            }
-+        }
++        //OptionLists
++        public const string Pages_OptionLists = "Pages.OptionLists";
++        public const string Pages_OptionLists_Create = "Pages.OptionLists.Create";
++        public const string Pages_OptionLists_Update = "Pages.OptionLists.Update";
++        public const string Pages_OptionLists_Delete = "Pages.OptionLists.Delete";
 +
-+        //GetListItemByIdInt
-+        [Theory]
-+        [InlineData(1, 1)]
-+        [InlineData(2, 2)]
-+        [InlineData(0, 0)]
-+        [InlineData(-1, 0)]
-+        [InlineData(9876, 0)]
-+        public async Task TestGetListItemByIdInt(int id, int expectedId)
-+        {
-+            //act
-+            var result = await _optionListItemService.GetListItemById(id);
++        //OptionListItems -> Tenants
++        public const string Pages_Tenants_OptionListItems = "Pages.Tenants.OptionListItems";
++        public const string Pages_Tenants_OptionListItems_Create = "Pages.Tenants.OptionListItems.Create";
++        public const string Pages_Tenants_OptionListItems_Update = "Pages.Tenants.OptionListItems.Update";
++        public const string Pages_Tenants_OptionListItems_Delete = "Pages.Tenants.OptionListItems.Delete";
 +
-+            //assert
-+            if (expectedId <= 0 || expectedId > 9800)
-+            {
-+                result.ShouldBeNull();
-+            }
-+            else
-+            {
-+                result.ShouldNotBeNull();
-+                result.Id.ShouldBe(expectedId);
-+            }
-+        }
++        //OptionListItems
++        public const string Pages_OptionListItems = "Pages.OptionListItems";
++        public const string Pages_OptionListItems_Create = "Pages.OptionListItems.Create";
++        public const string Pages_OptionListItems_Update = "Pages.OptionListItems.Update";
++        public const string Pages_OptionListItems_Delete = "Pages.OptionListItems.Delete";
+     }
+ }
+diff --git a/src/MGS.BoilerplateDemo.Core/Localization/SourceFiles/BoilerplateDemo.xml b/src/MGS.BoilerplateDemo.Core/Localization/SourceFiles/BoilerplateDemo.xml
+index 508c7fa..985d107 100644
+--- a/src/MGS.BoilerplateDemo.Core/Localization/SourceFiles/BoilerplateDemo.xml
++++ b/src/MGS.BoilerplateDemo.Core/Localization/SourceFiles/BoilerplateDemo.xml
+@@ -95,5 +95,29 @@
+     <text name="Skins">Skins</text>
+     <text name="Settings">Settings</text>
+     <text name="Filter">Filter</text>
++    
++    <!-- Permissions -->
++    <text name="Pages">Base Level Pages</text>
++    <text name="Administration">Administration</text>
++    <!-- Option Lists-->
++    <text name="OptionListsAll">Global Lists</text>
++    <text name="OptionListsCreateAll">Create Global List</text>
++    <text name="OptionListsUpdateAll">Update Global List</text>
++    <text name="OptionListsDeleteAll">Delete Global List</text>
 +
-+        //GetListItemsByListKey
-+        [Theory]
-+        [InlineData("States", 2)]
-+        [InlineData("colors", 3)]
-+        [InlineData("planets", 0)]
-+        [InlineData("", 0)]
-+        public async Task TestGetAllByListKey(string listKey, int expectedCount)
-+        {
-+            //arrange
-+            var input = new GetOptionListItemDto()
-+            {
-+                Key = listKey
-+            };
++    <text name="OptionListItemsAll">Global List Items</text>
++    <text name="OptionListItemsCreateAll">Create Global List Items</text>
++    <text name="OptionListItemsUpdateAll">Update Global List Items</text>
++    <text name="OptionListItemsDeleteAll">Delete Global List Items</text>
 +
-+            //act
-+            var results = await _optionListItemService.GetListItemsByListKey(input);
++    <text name="OptionLists">Local Lists</text>
++    <text name="OptionListsCreate">Create Local List</text>
++    <text name="OptionListsUpdate">Update Local List</text>
++    <text name="OptionListsDelete">Delete Local List</text>
 +
-+            //assert
-+            results.ShouldNotBeNull();
-+            results.Items.ShouldNotBeNull();
-+            results.Items.Count.ShouldBe(expectedCount);
-+        }
-+
-+        private const string TEST_LIST_DESCRIPTION = "A list description";
-+        private const string TEST_LIST_DISPLAYNAME = "TestList";
-+        private const string TEST_LIST_KEY = "TESTLIST";
-+
-+        private const string TEST_DISPLAY_TEXT = "List Item Test";
-+        private const string TEST_DISPLAY_TEXT_UPDATED = "New Item Text";
-+        private const string TEST_ADDITIONAL_INFO = "Info Text";
-+        private const string TEST_ADDITIONAL_INFO_UPDATED = "Updated Info Text";
-+        private const int TEST_DISPLAY_ORDER = 10;
-+        private const int TEST_DISPLAY_ORDER_UPDATED = 20;
-+
-+        private OptionListCreateOrEditDto GetAListForTesting()
-+        {
-+            return new OptionListCreateOrEditDto()
-+            {
-+                Description = TEST_LIST_DESCRIPTION,
-+                DisplayName = TEST_LIST_DISPLAYNAME,
-+                IsActive = true,
-+                OptionListKey = TEST_LIST_KEY,
-+                TenantId = null,
-+                OptionListItems = null,
-+            };
-+        }
-+
-+        private OptionListItemCreateOrEditDto GetAListItemForTesting(int listId)
-+        {
-+            return new OptionListItemCreateOrEditDto()
-+            {
-+                AdditionalInfo = TEST_ADDITIONAL_INFO,
-+                DisplayOrder = TEST_DISPLAY_ORDER,
-+                DisplayText = TEST_DISPLAY_TEXT,
-+                IsActive = true,
-+                OptionListId = listId,
-+            };
-+        }
-+
-+        private const string EXISTING_LIST_KEY = "States";
-+
-+        //CreateListItem
-+        [Fact]
-+        public async Task TestCreateListItem()
-+        {
-+            //arrange
-+            var theList = GetAListForTesting();
-+            await _optionListService.CreateOrUpdateList(theList);
-+            var theResult = await _optionListService.GetListByKey(new GetOptionListDto() { Key = TEST_LIST_KEY });
-+            theResult.ShouldNotBeNull();
-+
-+            var theItem = GetAListItemForTesting(theResult.Id);
-+            await _optionListItemService.CreateOrUpdateListItem(theItem);
-+
-+            await UsingDbContextAsync(async context => {
-+
-+
-+                var theNewResult = await _optionListService.GetListByKey(new GetOptionListDto() { Key = TEST_LIST_KEY });
-+                var items = await context.OptionListItems.Include(y => y.OptionList).Where(e => e.OptionListId == theItem.OptionListId).ToListAsync();
-+                items.ShouldNotBeNull();
-+                items.Count.ShouldBeGreaterThanOrEqualTo(1);
-+                var theAddedItem = items.FirstOrDefault(x => x.DisplayText == TEST_DISPLAY_TEXT);
-+                theAddedItem.AdditionalInfo.ShouldBe(TEST_ADDITIONAL_INFO);
-+                theAddedItem.DisplayOrder.ShouldBe(TEST_DISPLAY_ORDER);
-+            });
-+        }
-+
-+        private const string COLORS_LIST = "Colors";
-+
-+        //UpdateListItem
-+        [Fact]
-+        public async Task TestUpdateListItem()
-+        {
-+            //update an existing entry 
-+            //arrange
-+            var theList = await _optionListService.GetListByKey(new GetOptionListDto() { Key = COLORS_LIST });
-+            theList.ShouldNotBeNull();
-+            theList.OptionListItems.Count.ShouldBeGreaterThanOrEqualTo(3);
-+
-+            var theItem = theList.OptionListItems.FirstOrDefault(x => x.DisplayText.Equals("yellow", StringComparison.CurrentCultureIgnoreCase));
-+
-+            theItem.DisplayOrder = TEST_DISPLAY_ORDER_UPDATED;
-+            theItem.DisplayText = TEST_DISPLAY_TEXT_UPDATED;
-+            theItem.AdditionalInfo = TEST_ADDITIONAL_INFO_UPDATED;
-+
-+            var theItemAsCorEDto = new OptionListItemCreateOrEditDto()
-+            {
-+                AdditionalInfo = theItem.AdditionalInfo,
-+                IsActive = theItem.IsActive,
-+                OptionListId = theList.Id,
-+                DisplayOrder = theItem.DisplayOrder,
-+                DisplayText = theItem.DisplayText,
-+                Id = theItem.Id
-+            };
-+
-+            await _optionListItemService.CreateOrUpdateListItem(theItemAsCorEDto);
-+
-+            await UsingDbContextAsync(async context => {
-+                var theNewResult = await _optionListService.GetListByKey(new GetOptionListDto() { Key = COLORS_LIST });
-+                var items = await context.OptionListItems.Include(y => y.OptionList).Where(e => e.OptionListId == theItem.OptionListId).ToListAsync();
-+
-+                var allItems = await context.OptionListItems.ToListAsync();
-+
-+                items.ShouldNotBeNull();
-+                items.Count.ShouldBeGreaterThanOrEqualTo(1);
-+                var theUpdatedItem = items.FirstOrDefault(x => x.DisplayText == TEST_DISPLAY_TEXT_UPDATED);
-+                theUpdatedItem.AdditionalInfo.ShouldBe(TEST_ADDITIONAL_INFO_UPDATED);
-+                theUpdatedItem.DisplayOrder.ShouldBe(TEST_DISPLAY_ORDER_UPDATED);
-+            });
-+        }
-+
-+        //DeleteAllListItemsByListKey
-+        [Fact]
-+        public async Task TestDeleteAllListItemsByKey()
-+        {
-+            //arrange
-+            var theList = await _optionListService.GetListByKey(new GetOptionListDto() { Key = COLORS_LIST });
-+            theList.ShouldNotBeNull();
-+            theList.OptionListItems.Count.ShouldBeGreaterThanOrEqualTo(3);
-+
-+            //act
-+            await _optionListItemService.DeleteAllListItemsByListKey(COLORS_LIST);
-+
-+            await UsingDbContextAsync(async context => {
-+                var theNewResult = await _optionListService.GetListByKey(new GetOptionListDto() { Key = COLORS_LIST });
-+                var items = await context.OptionListItems.Include(y => y.OptionList).Where(e => e.OptionListId == theList.Id).ToListAsync();
-+                items.ShouldNotBeNull();
-+                items.Count.ShouldBe(0);
-+            });
-+        }
-+
-+        //DeleteListItemEntityDto
-+        [Fact]
-+        public async Task TestDeleteListItemByEntityDto()
-+        {
-+            //arrange
-+            var theList = await _optionListService.GetListByKey(new GetOptionListDto() { Key = COLORS_LIST });
-+            theList.ShouldNotBeNull();
-+            theList.OptionListItems.Count.ShouldBeGreaterThanOrEqualTo(3);
-+
-+            var theItem = theList.OptionListItems.FirstOrDefault(x => x.DisplayText.Equals("yellow", StringComparison.CurrentCultureIgnoreCase));
-+            theItem.IsDeleted.ShouldBeFalse();
-+
-+            //act
-+            await _optionListItemService.DeleteListItemByEntity(new EntityDto { Id = theItem.Id });
-+
-+            //assert
-+            await UsingDbContextAsync(async context => {
-+                var theNewResult = await _optionListService.GetListByKey(new GetOptionListDto() { Key = COLORS_LIST });
-+                var item = await context.OptionListItems.Include(y => y.OptionList).FirstOrDefaultAsync(e => e.Id == theItem.Id);
-+
-+                item.IsDeleted.ShouldBeTrue();
-+            });
-+        }
-+
-+        //DeleteListItemInt
-+        [Fact]
-+        public async Task TestDeleteListItemByIntId()
-+        {
-+            //arrange
-+            var theList = await _optionListService.GetListByKey(new GetOptionListDto() { Key = COLORS_LIST });
-+            theList.ShouldNotBeNull();
-+            theList.OptionListItems.Count.ShouldBeGreaterThanOrEqualTo(3);
-+
-+            var theItem = theList.OptionListItems.FirstOrDefault(x => x.DisplayText.Equals("yellow", StringComparison.CurrentCultureIgnoreCase));
-+            theItem.IsDeleted.ShouldBeFalse();
-+
-+            //act
-+            await _optionListItemService.DeleteListItem(theItem.Id);
-+
-+            //assert
-+            await UsingDbContextAsync(async context => {
-+                var theNewResult = await _optionListService.GetListByKey(new GetOptionListDto() { Key = COLORS_LIST });
-+                var item = await context.OptionListItems.Include(y => y.OptionList).FirstOrDefaultAsync(e => e.Id == theItem.Id);
-+
-+                item.IsDeleted.ShouldBeTrue();
-+            });
-+        }
-+    }
-+}
-diff --git a/test/MGS.BoilerplateDemo.Tests/OptionListAndListItems/OptionListTests.cs b/test/MGS.BoilerplateDemo.Tests/OptionListAndListItems/OptionListTests.cs
-new file mode 100644
-index 0000000..f65989d
---- /dev/null
-+++ b/test/MGS.BoilerplateDemo.Tests/OptionListAndListItems/OptionListTests.cs
-@@ -0,0 +1,41 @@
-+﻿using System.Globalization;
-+using System.Linq;
-+using System.Threading.Tasks;
-+using Microsoft.EntityFrameworkCore;
-+using Xunit;
-+using Shouldly;
-+using MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems;
-+using MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems.Dtos;
-+
-+
-+namespace MGS.BoilerplateDemo.Tests.OptionListAndListItems
-+{
-+    public class OptionListTests : BoilerplateDemoTestBase
-+    {
-+        IOptionListAppService _optionListService;
-+
-+        public OptionListTests()
-+        {
-+            _optionListService = Resolve<IOptionListAppService>();
-+        }
-+
-+        [Theory()]
-+        [InlineData("asdf", 0)]
-+        [InlineData("states", 1)]
-+        [InlineData("", 2)]
-+        public async Task TestGetAllLists(string filter, int expectedCount)
-+        {
-+            //arrange
-+            var input = new GetOptionListDto()
-+            {
-+                Filter = filter
-+            };
-+
-+            await UsingDbContextAsync(async context => {
-+                var lists = await context.OptionLists.Where(e => CultureInfo.InvariantCulture.CompareInfo.IndexOf(e.DisplayName, filter, CompareOptions.IgnoreCase) >= 0).ToListAsync();
-+                lists.ShouldNotBeNull();
-+                lists.Count.ShouldBe(expectedCount);
-+            });
-+        }
-+    }
-+}
-diff --git a/test/MGS.BoilerplateDemo.Tests/TestBuilders/TestListBuilder.cs b/test/MGS.BoilerplateDemo.Tests/TestBuilders/TestListBuilder.cs
-new file mode 100644
-index 0000000..a261f57
---- /dev/null
-+++ b/test/MGS.BoilerplateDemo.Tests/TestBuilders/TestListBuilder.cs
-@@ -0,0 +1,68 @@
-+﻿using MGS.BoilerplateDemo.BoilerplateDemo.OptionListsAndListItems;
-+using MGS.BoilerplateDemo.EntityFrameworkCore;
-+using System;
-+using System.Collections.Generic;
-+using System.Linq;
-+using System.Text;
-+using System.Threading.Tasks;
-+
-+namespace MGS.BoilerplateDemo.Tests.TestBuilders
-+{
-+    public class TestListBuilder
-+    {
-+        private readonly BoilerplateDemoDbContext _context;
-+
-+        public TestListBuilder(BoilerplateDemoDbContext context)
-+        {
-+            _context = context;
-+        }
-+
-+        public void Create()
-+        {
-+            CreateLists();
-+        }
-+
-+        public const string COLORS_LIST = "Colors";
-+        public const string STATES_LIST = "States";
-+        private void CreateLists()
-+        {
-+            var ol = CreateList(true, STATES_LIST, STATES_LIST, "States of the U.S.");
-+            CreateListItems(true, ol.Id, "Alabama", "AL");
-+            CreateListItems(true, ol.Id, "Iowa", "IA");
-+
-+            ol = CreateList(true, COLORS_LIST, COLORS_LIST, "Another List");
-+            CreateListItems(true, ol.Id, "Red", "Red");
-+            CreateListItems(true, ol.Id, "Orange", "Orange");
-+            CreateListItems(true, ol.Id, "Yellow", "Yellow");
-+        }
-+
-+        private OptionList CreateList(bool isActive, string key, string displayName, string description)
-+        {
-+            var optionList = new OptionList()
-+            {
-+                OptionListKey = key,
-+                IsActive = isActive,
-+                DisplayName = displayName,
-+                Description = description
-+            };
-+
-+            var ctx = _context.OptionLists.Add(optionList).Entity;
-+            _context.SaveChanges();
-+            return ctx;
-+        }
-+
-+        private OptionListItem CreateListItems(bool isActive, int listId, string displayText, string additionalInfo)
-+        {
-+            var optionListItem = new OptionListItem()
-+            {
-+                DisplayText = displayText,
-+                AdditionalInfo = additionalInfo,
-+                OptionListId = listId,
-+                IsActive = isActive
-+            };
-+            var ctx = _context.OptionListItems.Add(optionListItem).Entity;
-+            _context.SaveChanges();
-+            return ctx;
-+        }
-+    }
-+}
++    <text name="OptionListItems">Local List Items</text>
++    <text name="OptionListItemsCreate">Create Local List Item</text>
++    <text name="OptionListItemsUpdate">Update Local List Item</text>
++    <text name="OptionListItemsDelete">Delete Local List Item</text>
+   </texts>
+ </localizationDictionary>
