@@ -10,8 +10,8 @@ namespace MGS.BoilerplateDemo.EntityFrameworkCore
     public class BoilerplateDemoDbContext : AbpZeroDbContext<Tenant, Role, User, BoilerplateDemoDbContext>
     {
         /* Define a DbSet for each entity of the application */
-        DbSet<OptionList> OptionLists { get; set; }
-        DbSet<OptionListItem> OptionListItems { get; set; }
+        public virtual DbSet<OptionList> OptionLists { get; set; }
+        public virtual DbSet<OptionListItem> OptionListItems { get; set; }
 
         public BoilerplateDemoDbContext(DbContextOptions<BoilerplateDemoDbContext> options)
             : base(options)

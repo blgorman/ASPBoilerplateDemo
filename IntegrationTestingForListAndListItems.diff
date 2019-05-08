@@ -1,0 +1,478 @@
+diff --git a/src/MGS.BoilerplateDemo.EntityFrameworkCore/EntityFrameworkCore/BoilerplateDemoDbContext.cs b/src/MGS.BoilerplateDemo.EntityFrameworkCore/EntityFrameworkCore/BoilerplateDemoDbContext.cs
+index d0b512e..58d25e1 100644
+--- a/src/MGS.BoilerplateDemo.EntityFrameworkCore/EntityFrameworkCore/BoilerplateDemoDbContext.cs
++++ b/src/MGS.BoilerplateDemo.EntityFrameworkCore/EntityFrameworkCore/BoilerplateDemoDbContext.cs
+@@ -10,8 +10,8 @@ namespace MGS.BoilerplateDemo.EntityFrameworkCore
+     public class BoilerplateDemoDbContext : AbpZeroDbContext<Tenant, Role, User, BoilerplateDemoDbContext>
+     {
+         /* Define a DbSet for each entity of the application */
+-        DbSet<OptionList> OptionLists { get; set; }
+-        DbSet<OptionListItem> OptionListItems { get; set; }
++        public virtual DbSet<OptionList> OptionLists { get; set; }
++        public virtual DbSet<OptionListItem> OptionListItems { get; set; }
+ 
+         public BoilerplateDemoDbContext(DbContextOptions<BoilerplateDemoDbContext> options)
+             : base(options)
+diff --git a/test/MGS.BoilerplateDemo.Tests/BoilerplateDemoTestBase.cs b/test/MGS.BoilerplateDemo.Tests/BoilerplateDemoTestBase.cs
+index a8136f3..8733d9a 100644
+--- a/test/MGS.BoilerplateDemo.Tests/BoilerplateDemoTestBase.cs
++++ b/test/MGS.BoilerplateDemo.Tests/BoilerplateDemoTestBase.cs
+@@ -14,6 +14,7 @@ using MGS.BoilerplateDemo.EntityFrameworkCore;
+ using MGS.BoilerplateDemo.EntityFrameworkCore.Seed.Host;
+ using MGS.BoilerplateDemo.EntityFrameworkCore.Seed.Tenants;
+ using MGS.BoilerplateDemo.MultiTenancy;
++using MGS.BoilerplateDemo.Tests.TestBuilders;
+ 
+ namespace MGS.BoilerplateDemo.Tests
+ {
+@@ -45,6 +46,11 @@ namespace MGS.BoilerplateDemo.Tests
+                 new TenantRoleAndUserBuilder(context, 1).Create();
+             });
+ 
++            UsingDbContext(context => {
++                NormalizeDbContext(context);
++                new TestListBuilder(context).Create();
++            });
++
+             LoginAsDefaultTenantAdmin();
+         }
+ 
+diff --git a/test/MGS.BoilerplateDemo.Tests/MGS.BoilerplateDemo.Tests.csproj b/test/MGS.BoilerplateDemo.Tests/MGS.BoilerplateDemo.Tests.csproj
+index db6e85b..ecce9ea 100644
+--- a/test/MGS.BoilerplateDemo.Tests/MGS.BoilerplateDemo.Tests.csproj
++++ b/test/MGS.BoilerplateDemo.Tests/MGS.BoilerplateDemo.Tests.csproj
+@@ -1,4 +1,4 @@
+-<Project Sdk="Microsoft.NET.Sdk">
++﻿<Project Sdk="Microsoft.NET.Sdk">
+   <PropertyGroup>
+     <VersionPrefix>1.0.0.0</VersionPrefix>
+     <TargetFramework>netcoreapp2.2</TargetFramework>
+diff --git a/test/MGS.BoilerplateDemo.Tests/OptionListAndListItems/OptionListItemsTest.cs b/test/MGS.BoilerplateDemo.Tests/OptionListAndListItems/OptionListItemsTest.cs
+new file mode 100644
+index 0000000..9e39353
+--- /dev/null
++++ b/test/MGS.BoilerplateDemo.Tests/OptionListAndListItems/OptionListItemsTest.cs
+@@ -0,0 +1,302 @@
++﻿using Abp.Application.Services.Dto;
++using MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems;
++using MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems.Dtos;
++using Microsoft.EntityFrameworkCore;
++using Shouldly;
++using Xunit;
++using System;
++using System.Linq;
++using System.Threading.Tasks;
++
++namespace MGS.BoilerplateDemo.Tests.OptionListAndListItems
++{
++    public class OptionListItemsTest : BoilerplateDemoTestBase
++    {
++
++        IOptionListAppService _optionListService;
++        IOptionListItemsAppService _optionListItemService;
++
++        public OptionListItemsTest()
++        {
++            LoginAsHostAdmin();
++            _optionListService = Resolve<IOptionListAppService>();
++            _optionListItemService = Resolve<IOptionListItemsAppService>();
++        }
++
++        //GetAll by filter
++        [Theory]
++        [InlineData("asdf", 0)]
++        [InlineData("AL", 1)]
++        [InlineData("Iowa", 1)]
++        [InlineData("Oran", 1)]
++        [InlineData("", 5)]
++        public async Task TestGetAllByFilter(string filter, int expectedCount)
++        {
++            //arrange
++            var input = new GetOptionListItemDto()
++            {
++                Filter = filter
++            };
++
++            //act
++            var results = await _optionListItemService.GetAllOptionListItems(input);
++
++            //assert
++            results.ShouldNotBeNull();
++            results.Items.Count.ShouldBe(expectedCount);
++        }
++
++        //GetListItemByIdEntityDto
++        [Theory]
++        [InlineData(1, 1)]
++        [InlineData(2, 2)]
++        [InlineData(0, 0)]
++        [InlineData(-1, 0)]
++        [InlineData(9876, 0)]
++        public async Task TestGetListItemByIdEntityDto(int id, int expectedId)
++        {
++            //arrange
++            var input = new EntityDto()
++            {
++                Id = id
++            };
++
++            //act
++            var result = await _optionListItemService.GetListItemByEntityId(input);
++
++            //assert
++            if (expectedId <= 0 || expectedId > 9800)
++            {
++                result.ShouldBeNull();
++            }
++            else
++            {
++                result.ShouldNotBeNull();
++                result.Id.ShouldBe(expectedId);
++            }
++        }
++
++        //GetListItemByIdInt
++        [Theory]
++        [InlineData(1, 1)]
++        [InlineData(2, 2)]
++        [InlineData(0, 0)]
++        [InlineData(-1, 0)]
++        [InlineData(9876, 0)]
++        public async Task TestGetListItemByIdInt(int id, int expectedId)
++        {
++            //act
++            var result = await _optionListItemService.GetListItemById(id);
++
++            //assert
++            if (expectedId <= 0 || expectedId > 9800)
++            {
++                result.ShouldBeNull();
++            }
++            else
++            {
++                result.ShouldNotBeNull();
++                result.Id.ShouldBe(expectedId);
++            }
++        }
++
++        //GetListItemsByListKey
++        [Theory]
++        [InlineData("States", 2)]
++        [InlineData("colors", 3)]
++        [InlineData("planets", 0)]
++        [InlineData("", 0)]
++        public async Task TestGetAllByListKey(string listKey, int expectedCount)
++        {
++            //arrange
++            var input = new GetOptionListItemDto()
++            {
++                Key = listKey
++            };
++
++            //act
++            var results = await _optionListItemService.GetListItemsByListKey(input);
++
++            //assert
++            results.ShouldNotBeNull();
++            results.Items.ShouldNotBeNull();
++            results.Items.Count.ShouldBe(expectedCount);
++        }
++
++        private const string TEST_LIST_DESCRIPTION = "A list description";
++        private const string TEST_LIST_DISPLAYNAME = "TestList";
++        private const string TEST_LIST_KEY = "TESTLIST";
++
++        private const string TEST_DISPLAY_TEXT = "List Item Test";
++        private const string TEST_DISPLAY_TEXT_UPDATED = "New Item Text";
++        private const string TEST_ADDITIONAL_INFO = "Info Text";
++        private const string TEST_ADDITIONAL_INFO_UPDATED = "Updated Info Text";
++        private const int TEST_DISPLAY_ORDER = 10;
++        private const int TEST_DISPLAY_ORDER_UPDATED = 20;
++
++        private OptionListCreateOrEditDto GetAListForTesting()
++        {
++            return new OptionListCreateOrEditDto()
++            {
++                Description = TEST_LIST_DESCRIPTION,
++                DisplayName = TEST_LIST_DISPLAYNAME,
++                IsActive = true,
++                OptionListKey = TEST_LIST_KEY,
++                TenantId = null,
++                OptionListItems = null,
++            };
++        }
++
++        private OptionListItemCreateOrEditDto GetAListItemForTesting(int listId)
++        {
++            return new OptionListItemCreateOrEditDto()
++            {
++                AdditionalInfo = TEST_ADDITIONAL_INFO,
++                DisplayOrder = TEST_DISPLAY_ORDER,
++                DisplayText = TEST_DISPLAY_TEXT,
++                IsActive = true,
++                OptionListId = listId,
++            };
++        }
++
++        private const string EXISTING_LIST_KEY = "States";
++
++        //CreateListItem
++        [Fact]
++        public async Task TestCreateListItem()
++        {
++            //arrange
++            var theList = GetAListForTesting();
++            await _optionListService.CreateOrUpdateList(theList);
++            var theResult = await _optionListService.GetListByKey(new GetOptionListDto() { Key = TEST_LIST_KEY });
++            theResult.ShouldNotBeNull();
++
++            var theItem = GetAListItemForTesting(theResult.Id);
++            await _optionListItemService.CreateOrUpdateListItem(theItem);
++
++            await UsingDbContextAsync(async context => {
++
++
++                var theNewResult = await _optionListService.GetListByKey(new GetOptionListDto() { Key = TEST_LIST_KEY });
++                var items = await context.OptionListItems.Include(y => y.OptionList).Where(e => e.OptionListId == theItem.OptionListId).ToListAsync();
++                items.ShouldNotBeNull();
++                items.Count.ShouldBeGreaterThanOrEqualTo(1);
++                var theAddedItem = items.FirstOrDefault(x => x.DisplayText == TEST_DISPLAY_TEXT);
++                theAddedItem.AdditionalInfo.ShouldBe(TEST_ADDITIONAL_INFO);
++                theAddedItem.DisplayOrder.ShouldBe(TEST_DISPLAY_ORDER);
++            });
++        }
++
++        private const string COLORS_LIST = "Colors";
++
++        //UpdateListItem
++        [Fact]
++        public async Task TestUpdateListItem()
++        {
++            //update an existing entry 
++            //arrange
++            var theList = await _optionListService.GetListByKey(new GetOptionListDto() { Key = COLORS_LIST });
++            theList.ShouldNotBeNull();
++            theList.OptionListItems.Count.ShouldBeGreaterThanOrEqualTo(3);
++
++            var theItem = theList.OptionListItems.FirstOrDefault(x => x.DisplayText.Equals("yellow", StringComparison.CurrentCultureIgnoreCase));
++
++            theItem.DisplayOrder = TEST_DISPLAY_ORDER_UPDATED;
++            theItem.DisplayText = TEST_DISPLAY_TEXT_UPDATED;
++            theItem.AdditionalInfo = TEST_ADDITIONAL_INFO_UPDATED;
++
++            var theItemAsCorEDto = new OptionListItemCreateOrEditDto()
++            {
++                AdditionalInfo = theItem.AdditionalInfo,
++                IsActive = theItem.IsActive,
++                OptionListId = theList.Id,
++                DisplayOrder = theItem.DisplayOrder,
++                DisplayText = theItem.DisplayText,
++                Id = theItem.Id
++            };
++
++            await _optionListItemService.CreateOrUpdateListItem(theItemAsCorEDto);
++
++            await UsingDbContextAsync(async context => {
++                var theNewResult = await _optionListService.GetListByKey(new GetOptionListDto() { Key = COLORS_LIST });
++                var items = await context.OptionListItems.Include(y => y.OptionList).Where(e => e.OptionListId == theItem.OptionListId).ToListAsync();
++
++                var allItems = await context.OptionListItems.ToListAsync();
++
++                items.ShouldNotBeNull();
++                items.Count.ShouldBeGreaterThanOrEqualTo(1);
++                var theUpdatedItem = items.FirstOrDefault(x => x.DisplayText == TEST_DISPLAY_TEXT_UPDATED);
++                theUpdatedItem.AdditionalInfo.ShouldBe(TEST_ADDITIONAL_INFO_UPDATED);
++                theUpdatedItem.DisplayOrder.ShouldBe(TEST_DISPLAY_ORDER_UPDATED);
++            });
++        }
++
++        //DeleteAllListItemsByListKey
++        [Fact]
++        public async Task TestDeleteAllListItemsByKey()
++        {
++            //arrange
++            var theList = await _optionListService.GetListByKey(new GetOptionListDto() { Key = COLORS_LIST });
++            theList.ShouldNotBeNull();
++            theList.OptionListItems.Count.ShouldBeGreaterThanOrEqualTo(3);
++
++            //act
++            await _optionListItemService.DeleteAllListItemsByListKey(COLORS_LIST);
++
++            await UsingDbContextAsync(async context => {
++                var theNewResult = await _optionListService.GetListByKey(new GetOptionListDto() { Key = COLORS_LIST });
++                var items = await context.OptionListItems.Include(y => y.OptionList).Where(e => e.OptionListId == theList.Id).ToListAsync();
++                items.ShouldNotBeNull();
++                items.Count.ShouldBe(0);
++            });
++        }
++
++        //DeleteListItemEntityDto
++        [Fact]
++        public async Task TestDeleteListItemByEntityDto()
++        {
++            //arrange
++            var theList = await _optionListService.GetListByKey(new GetOptionListDto() { Key = COLORS_LIST });
++            theList.ShouldNotBeNull();
++            theList.OptionListItems.Count.ShouldBeGreaterThanOrEqualTo(3);
++
++            var theItem = theList.OptionListItems.FirstOrDefault(x => x.DisplayText.Equals("yellow", StringComparison.CurrentCultureIgnoreCase));
++            theItem.IsDeleted.ShouldBeFalse();
++
++            //act
++            await _optionListItemService.DeleteListItemByEntity(new EntityDto { Id = theItem.Id });
++
++            //assert
++            await UsingDbContextAsync(async context => {
++                var theNewResult = await _optionListService.GetListByKey(new GetOptionListDto() { Key = COLORS_LIST });
++                var item = await context.OptionListItems.Include(y => y.OptionList).FirstOrDefaultAsync(e => e.Id == theItem.Id);
++
++                item.IsDeleted.ShouldBeTrue();
++            });
++        }
++
++        //DeleteListItemInt
++        [Fact]
++        public async Task TestDeleteListItemByIntId()
++        {
++            //arrange
++            var theList = await _optionListService.GetListByKey(new GetOptionListDto() { Key = COLORS_LIST });
++            theList.ShouldNotBeNull();
++            theList.OptionListItems.Count.ShouldBeGreaterThanOrEqualTo(3);
++
++            var theItem = theList.OptionListItems.FirstOrDefault(x => x.DisplayText.Equals("yellow", StringComparison.CurrentCultureIgnoreCase));
++            theItem.IsDeleted.ShouldBeFalse();
++
++            //act
++            await _optionListItemService.DeleteListItem(theItem.Id);
++
++            //assert
++            await UsingDbContextAsync(async context => {
++                var theNewResult = await _optionListService.GetListByKey(new GetOptionListDto() { Key = COLORS_LIST });
++                var item = await context.OptionListItems.Include(y => y.OptionList).FirstOrDefaultAsync(e => e.Id == theItem.Id);
++
++                item.IsDeleted.ShouldBeTrue();
++            });
++        }
++    }
++}
+diff --git a/test/MGS.BoilerplateDemo.Tests/OptionListAndListItems/OptionListTests.cs b/test/MGS.BoilerplateDemo.Tests/OptionListAndListItems/OptionListTests.cs
+new file mode 100644
+index 0000000..f65989d
+--- /dev/null
++++ b/test/MGS.BoilerplateDemo.Tests/OptionListAndListItems/OptionListTests.cs
+@@ -0,0 +1,41 @@
++﻿using System.Globalization;
++using System.Linq;
++using System.Threading.Tasks;
++using Microsoft.EntityFrameworkCore;
++using Xunit;
++using Shouldly;
++using MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems;
++using MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems.Dtos;
++
++
++namespace MGS.BoilerplateDemo.Tests.OptionListAndListItems
++{
++    public class OptionListTests : BoilerplateDemoTestBase
++    {
++        IOptionListAppService _optionListService;
++
++        public OptionListTests()
++        {
++            _optionListService = Resolve<IOptionListAppService>();
++        }
++
++        [Theory()]
++        [InlineData("asdf", 0)]
++        [InlineData("states", 1)]
++        [InlineData("", 2)]
++        public async Task TestGetAllLists(string filter, int expectedCount)
++        {
++            //arrange
++            var input = new GetOptionListDto()
++            {
++                Filter = filter
++            };
++
++            await UsingDbContextAsync(async context => {
++                var lists = await context.OptionLists.Where(e => CultureInfo.InvariantCulture.CompareInfo.IndexOf(e.DisplayName, filter, CompareOptions.IgnoreCase) >= 0).ToListAsync();
++                lists.ShouldNotBeNull();
++                lists.Count.ShouldBe(expectedCount);
++            });
++        }
++    }
++}
+diff --git a/test/MGS.BoilerplateDemo.Tests/TestBuilders/TestListBuilder.cs b/test/MGS.BoilerplateDemo.Tests/TestBuilders/TestListBuilder.cs
+new file mode 100644
+index 0000000..a261f57
+--- /dev/null
++++ b/test/MGS.BoilerplateDemo.Tests/TestBuilders/TestListBuilder.cs
+@@ -0,0 +1,68 @@
++﻿using MGS.BoilerplateDemo.BoilerplateDemo.OptionListsAndListItems;
++using MGS.BoilerplateDemo.EntityFrameworkCore;
++using System;
++using System.Collections.Generic;
++using System.Linq;
++using System.Text;
++using System.Threading.Tasks;
++
++namespace MGS.BoilerplateDemo.Tests.TestBuilders
++{
++    public class TestListBuilder
++    {
++        private readonly BoilerplateDemoDbContext _context;
++
++        public TestListBuilder(BoilerplateDemoDbContext context)
++        {
++            _context = context;
++        }
++
++        public void Create()
++        {
++            CreateLists();
++        }
++
++        public const string COLORS_LIST = "Colors";
++        public const string STATES_LIST = "States";
++        private void CreateLists()
++        {
++            var ol = CreateList(true, STATES_LIST, STATES_LIST, "States of the U.S.");
++            CreateListItems(true, ol.Id, "Alabama", "AL");
++            CreateListItems(true, ol.Id, "Iowa", "IA");
++
++            ol = CreateList(true, COLORS_LIST, COLORS_LIST, "Another List");
++            CreateListItems(true, ol.Id, "Red", "Red");
++            CreateListItems(true, ol.Id, "Orange", "Orange");
++            CreateListItems(true, ol.Id, "Yellow", "Yellow");
++        }
++
++        private OptionList CreateList(bool isActive, string key, string displayName, string description)
++        {
++            var optionList = new OptionList()
++            {
++                OptionListKey = key,
++                IsActive = isActive,
++                DisplayName = displayName,
++                Description = description
++            };
++
++            var ctx = _context.OptionLists.Add(optionList).Entity;
++            _context.SaveChanges();
++            return ctx;
++        }
++
++        private OptionListItem CreateListItems(bool isActive, int listId, string displayText, string additionalInfo)
++        {
++            var optionListItem = new OptionListItem()
++            {
++                DisplayText = displayText,
++                AdditionalInfo = additionalInfo,
++                OptionListId = listId,
++                IsActive = isActive
++            };
++            var ctx = _context.OptionListItems.Add(optionListItem).Entity;
++            _context.SaveChanges();
++            return ctx;
++        }
++    }
++}
