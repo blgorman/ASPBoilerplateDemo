@@ -118,5 +118,14 @@
     <text name="OptionListItemsCreate">Create Local List Item</text>
     <text name="OptionListItemsUpdate">Update Local List Item</text>
     <text name="OptionListItemsDelete">Delete Local List Item</text>
+    
+    <!-- Menu Items -->
+    <text name="AdministrationMenuGlobal">Global Administration</text>
+    <text name="OptionListsMenuGlobal">Global Option Lists</text>
+    <text name="OptionListItemsMenuGlobal">Global Option List Items</text>
+
+    <text name="AdministrationMenu">Administration</text>
+    <text name="OptionListsMenu">Option Lists</text>
+    <text name="OptionListItemsMenu">Option List Items</text>
   </texts>
 </localizationDictionary>
