@@ -1,0 +1,62 @@
+diff --git a/src/MGS.BoilerplateDemo.Core/Localization/SourceFiles/BoilerplateDemo.xml b/src/MGS.BoilerplateDemo.Core/Localization/SourceFiles/BoilerplateDemo.xml
+index ed8567c..a8273e6 100644
+--- a/src/MGS.BoilerplateDemo.Core/Localization/SourceFiles/BoilerplateDemo.xml
++++ b/src/MGS.BoilerplateDemo.Core/Localization/SourceFiles/BoilerplateDemo.xml
+@@ -118,5 +118,14 @@
+     <text name="OptionListItemsCreate">Create Local List Item</text>
+     <text name="OptionListItemsUpdate">Update Local List Item</text>
+     <text name="OptionListItemsDelete">Delete Local List Item</text>
++    
++    <!-- Menu Items -->
++    <text name="AdministrationMenuGlobal">Global Administration</text>
++    <text name="OptionListsMenuGlobal">Global Option Lists</text>
++    <text name="OptionListItemsMenuGlobal">Global Option List Items</text>
++
++    <text name="AdministrationMenu">Administration</text>
++    <text name="OptionListsMenu">Option Lists</text>
++    <text name="OptionListItemsMenu">Option List Items</text>
+   </texts>
+ </localizationDictionary>
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/layout/sidebar-nav.component.ts b/src/MGS.BoilerplateDemo.Web.Host/src/app/layout/sidebar-nav.component.ts
+index 7d44159..a7ddfc7 100644
+--- a/src/MGS.BoilerplateDemo.Web.Host/src/app/layout/sidebar-nav.component.ts
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/layout/sidebar-nav.component.ts
+@@ -15,24 +15,20 @@ export class SideBarNavComponent extends AppComponentBase {
+         new MenuItem(this.l('Tenants'), 'Pages.Tenants', 'business', '/app/tenants'),
+         new MenuItem(this.l('Users'), 'Pages.Users', 'people', '/app/users'),
+         new MenuItem(this.l('Roles'), 'Pages.Roles', 'local_offer', '/app/roles'),
+-        new MenuItem(this.l('About'), '', 'info', '/app/about'),
+-
+-        new MenuItem(this.l('MultiLevelMenu'), '', 'menu', '', [
+-            new MenuItem('ASP.NET Boilerplate', '', '', '', [
+-                new MenuItem('Home', '', '', 'https://aspnetboilerplate.com/?ref=abptmpl'),
+-                new MenuItem('Templates', '', '', 'https://aspnetboilerplate.com/Templates?ref=abptmpl'),
+-                new MenuItem('Samples', '', '', 'https://aspnetboilerplate.com/Samples?ref=abptmpl'),
+-                new MenuItem('Documents', '', '', 'https://aspnetboilerplate.com/Pages/Documents?ref=abptmpl')
+-            ]),
+-            new MenuItem('ASP.NET Zero', '', '', '', [
+-                new MenuItem('Home', '', '', 'https://aspnetzero.com?ref=abptmpl'),
+-                new MenuItem('Description', '', '', 'https://aspnetzero.com/?ref=abptmpl#description'),
+-                new MenuItem('Features', '', '', 'https://aspnetzero.com/?ref=abptmpl#features'),
+-                new MenuItem('Pricing', '', '', 'https://aspnetzero.com/?ref=abptmpl#pricing'),
+-                new MenuItem('Faq', '', '', 'https://aspnetzero.com/Faq?ref=abptmpl'),
+-                new MenuItem('Documents', '', '', 'https://aspnetzero.com/Documents?ref=abptmpl')
+-            ])
+-        ])
++        
++        // Administration for the Host Level
++        new MenuItem(this.l("AdministrationMenuGlobal"), "Administration", "menu", "", [
++            new MenuItem(this.l("OptionListsMenuGlobal"), "Pages.Tenants.OptionLists", "", "/app/host/optionlists"),
++            new MenuItem(this.l("OptionListItemsMenuGlobal"), "Pages.Tenants.OptionListItems", "", "/app/host/optionlistitems")
++        ]),
++
++        // Option list administration at the tenant level
++        new MenuItem(this.l("AdministrationMenu"), "Pages.OptionLists", "menu", "", [
++            new MenuItem(this.l("OptionListsMenu"), "Pages.OptionLists", "", "optionlists"),
++            new MenuItem(this.l("OptionListItemsMenu"), "Pages.OptionListItems", "", "optionlistitems")
++        ]),
++
++        //Further menus can be added here as desired..
+     ];
+ 
+     constructor(
