@@ -28,6 +28,10 @@ namespace MGS.BoilerplateDemo.EntityFrameworkCore.Seed.Host
 
         private void CreateList(string key, string displayName, string description)
         {
+            var existing = _context.OptionLists.ToList();
+            var exists = existing.FirstOrDefault(x => x.DisplayName.Equals(displayName, StringComparison.OrdinalIgnoreCase));
+            if (exists != null) return;
+
             var ol = new OptionList()
             {
                 DisplayName = displayName,

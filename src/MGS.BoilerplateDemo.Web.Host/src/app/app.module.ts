@@ -120,7 +120,23 @@ import { HostEditOptionListItemsDialogComponent } from './host/optionlistitems/e
     // users
     CreateUserDialogComponent,
     EditUserDialogComponent,
-    ResetPasswordDialogComponent
+    ResetPasswordDialogComponent,
+    //option lists tenant level
+    OptionListsComponent,
+    CreateOptionListDialogComponent,
+    EditOptionListDialogComponent,
+    // option list items
+    OptionListItemsComponent,
+    CreateOptionListItemsDialogComponent,
+    EditOptionListItemsDialogComponent,
+    //host option lists
+    HostOptionListsComponent,
+    HostCreateOptionListDialogComponent,
+    HostEditOptionListDialogComponent,
+    //host option list items
+    HostOptionListItemsComponent,
+    HostCreateOptionListItemsDialogComponent,
+    HostEditOptionListItemsDialogComponent
   ]
 })
 export class AppModule {}
