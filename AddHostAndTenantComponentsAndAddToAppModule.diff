@@ -1,0 +1,1205 @@
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/app.module.ts b/src/MGS.BoilerplateDemo.Web.Host/src/app/app.module.ts
+index 0026d5b..c4b337d 100644
+--- a/src/MGS.BoilerplateDemo.Web.Host/src/app/app.module.ts
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/app.module.ts
+@@ -37,6 +37,22 @@ import { CreateUserDialogComponent } from '@app/users/create-user/create-user-di
+ import { EditUserDialogComponent } from '@app/users/edit-user/edit-user-dialog.component';
+ import { ChangePasswordComponent } from './users/change-password/change-password.component';
+ import { ResetPasswordDialogComponent } from './users/reset-password/reset-password.component';
++//option lists tenant level
++import { OptionListsComponent } from './optionlists/optionlists.component';
++import { CreateOptionListDialogComponent } from './optionlists/create/create-optionlist-dialog.component';
++import { EditOptionListDialogComponent } from './optionlists/edit/edit-optionlist-dialog.component';
++// option list items
++import { OptionListItemsComponent } from './optionlistitems/optionlistitems.component';
++import { CreateOptionListItemsDialogComponent } from './optionlistitems/create/create-optionlistitems-dialog.component';
++import { EditOptionListItemsDialogComponent } from './optionlistitems/edit/edit-optionlistitems-dialog.component';
++//host lists
++import { HostOptionListsComponent } from './host/optionlists/hostoptionlists.component';
++import { HostCreateOptionListDialogComponent } from './host/optionlists/create/create-hostoptionlist-dialog.component';
++import { HostEditOptionListDialogComponent } from './host/optionlists/edit/edit-hostoptionlist-dialog.component';
++//host list items
++import { HostOptionListItemsComponent } from './host/optionlistitems/optionlistitems.component';
++import { HostCreateOptionListItemsDialogComponent } from './host/optionlistitems/create/create-optionlistitems-dialog.component';
++import { HostEditOptionListItemsDialogComponent } from './host/optionlistitems/edit/edit-optionlistitems-dialog.component';
+ 
+ @NgModule({
+   declarations: [
+@@ -62,7 +78,23 @@ import { ResetPasswordDialogComponent } from './users/reset-password/reset-passw
+     CreateUserDialogComponent,
+     EditUserDialogComponent,
+     ChangePasswordComponent,
+-    ResetPasswordDialogComponent
++    ResetPasswordDialogComponent,
++    //option lists tenant level
++    OptionListsComponent,
++    CreateOptionListDialogComponent,
++    EditOptionListDialogComponent,
++    // option list items
++    OptionListItemsComponent,
++    CreateOptionListItemsDialogComponent,
++    EditOptionListItemsDialogComponent,
++    //host option lists
++    HostOptionListsComponent,
++    HostCreateOptionListDialogComponent,
++    HostEditOptionListDialogComponent,
++    //host option list items
++    HostOptionListItemsComponent,
++    HostCreateOptionListItemsDialogComponent,
++    HostEditOptionListItemsDialogComponent
+   ],
+   imports: [
+     CommonModule,
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlistitems/create/create-optionlistitems-dialog.component.html b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlistitems/create/create-optionlistitems-dialog.component.html
+new file mode 100644
+index 0000000..14f2576
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlistitems/create/create-optionlistitems-dialog.component.html
+@@ -0,0 +1 @@
++<h1>Create host option list items</h1>
+\ No newline at end of file
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlistitems/create/create-optionlistitems-dialog.component.less b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlistitems/create/create-optionlistitems-dialog.component.less
+new file mode 100644
+index 0000000..fc8c206
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlistitems/create/create-optionlistitems-dialog.component.less
+@@ -0,0 +1,6 @@
++mat-form-field {
++    width: 100%;
++}
++mat-checkbox {
++    padding-bottom: 5px;
++}
+\ No newline at end of file
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlistitems/create/create-optionlistitems-dialog.component.ts b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlistitems/create/create-optionlistitems-dialog.component.ts
+new file mode 100644
+index 0000000..198f105
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlistitems/create/create-optionlistitems-dialog.component.ts
+@@ -0,0 +1,25 @@
++import { Component, OnInit, Injector } from "@angular/core";
++import { AppComponentBase } from "@shared/app-component-base";
++import { OptionListItemCreateOrEditDto, OptionListItemsServiceProxy } from "@shared/service-proxies/service-proxies";
++import { MatDialogRef } from "@angular/material";
++
++@Component({
++    templateUrl: './create-optionlistitems-dialog.component.html',
++    styleUrls: ['./create-optionlistitems-dialog.component.less']
++})
++export class HostCreateOptionListItemsDialogComponent extends AppComponentBase implements OnInit {
++    
++    saving = false;
++    optionListItem: OptionListItemCreateOrEditDto = new OptionListItemCreateOrEditDto();
++  
++    constructor(injector: Injector,
++                  private _optionListItemService: OptionListItemsServiceProxy,
++                  private _dialogRef: MatDialogRef<HostCreateOptionListItemsDialogComponent>) 
++    {
++        super(injector);
++    }
++
++    ngOnInit(): void {
++        throw new Error("Method not implemented.");
++    }
++}  
+\ No newline at end of file
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlistitems/edit/edit-optionlistitems-dialog.component.html b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlistitems/edit/edit-optionlistitems-dialog.component.html
+new file mode 100644
+index 0000000..b338207
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlistitems/edit/edit-optionlistitems-dialog.component.html
+@@ -0,0 +1 @@
++<h1>Edit host option list items</h1>
+\ No newline at end of file
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlistitems/edit/edit-optionlistitems-dialog.component.less b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlistitems/edit/edit-optionlistitems-dialog.component.less
+new file mode 100644
+index 0000000..fc8c206
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlistitems/edit/edit-optionlistitems-dialog.component.less
+@@ -0,0 +1,6 @@
++mat-form-field {
++    width: 100%;
++}
++mat-checkbox {
++    padding-bottom: 5px;
++}
+\ No newline at end of file
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlistitems/edit/edit-optionlistitems-dialog.component.ts b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlistitems/edit/edit-optionlistitems-dialog.component.ts
+new file mode 100644
+index 0000000..5984488
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlistitems/edit/edit-optionlistitems-dialog.component.ts
+@@ -0,0 +1,30 @@
++import { OptionListItemViewDto, OptionListItemsServiceProxy } from "@shared/service-proxies/service-proxies";
++import { Component, OnInit, Injector, Optional, Inject } from "@angular/core";
++import { AppComponentBase } from "@shared/app-component-base";
++import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material";
++import { Title } from "@angular/platform-browser";
++
++@Component({
++    templateUrl: './edit-optionlistitems-dialog.component.html',
++    styleUrls: ['./edit-optionlistitems-dialog.component.less']
++})
++export class HostEditOptionListItemsDialogComponent extends AppComponentBase implements OnInit {
++    saving = false;
++    optionListItem: OptionListItemViewDto = new OptionListItemViewDto();
++  
++    constructor (injector: Injector,
++              private _optionListItemService: OptionListItemsServiceProxy,
++              private _dialogRef: MatDialogRef<HostEditOptionListItemsDialogComponent>,
++              @Optional() @Inject(MAT_DIALOG_DATA) private _id: number,
++              private titleService: Title) 
++    {
++        super(injector);
++    }
++  
++    ngOnInit(): void {
++        this._optionListItemService.getListItemById(this._id).subscribe((result: OptionListItemViewDto) => {
++                this.optionListItem = result;
++                this.titleService.setTitle(this.optionListItem.displayText);
++        });
++    }
++}
+\ No newline at end of file
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlistitems/optionlistitems.component.html b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlistitems/optionlistitems.component.html
+new file mode 100644
+index 0000000..24152d4
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlistitems/optionlistitems.component.html
+@@ -0,0 +1 @@
++<h1>Host Option List Items</h1>
+\ No newline at end of file
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlistitems/optionlistitems.component.less b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlistitems/optionlistitems.component.less
+new file mode 100644
+index 0000000..e69de29
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlistitems/optionlistitems.component.ts b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlistitems/optionlistitems.component.ts
+new file mode 100644
+index 0000000..7536645
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlistitems/optionlistitems.component.ts
+@@ -0,0 +1,36 @@
++import { Component, Injector } from "@angular/core";
++import { appModuleAnimation } from "@shared/animations/routerTransition";
++import { PagedListingComponentBase, PagedRequestDto } from "@shared/paged-listing-component-base";
++import { OptionListItemViewDto, OptionListItemsServiceProxy } from "@shared/service-proxies/service-proxies";
++import { MatDialog } from "@angular/material";
++
++class PagedOptionListItemRequestDto extends PagedRequestDto {
++    filter: string;
++    key: string;
++    sorting: string;
++}
++
++@Component({
++    templateUrl: './optionlistitems.component.html',
++    styleUrls: ['./optionlistitems.component.less'],
++    animations: [appModuleAnimation()]
++})
++export class HostOptionListItemsComponent extends PagedListingComponentBase<OptionListItemViewDto> {
++
++    optionListItems: OptionListItemViewDto[] = [];
++
++    constructor(injector: Injector,
++                private _optionListItemService: OptionListItemsServiceProxy,
++                private _dialog: MatDialog) 
++    {
++        super(injector);
++    }
++
++    protected list(request: PagedOptionListItemRequestDto, pageNumber: number, finishedCallback: Function): void {
++        throw new Error("Method not implemented.");
++    }
++
++    protected delete(entity: OptionListItemViewDto): void {
++        throw new Error("Method not implemented.");
++    }
++}
+\ No newline at end of file
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlists/create/create-hostoptionlist-dialog.component.html b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlists/create/create-hostoptionlist-dialog.component.html
+new file mode 100644
+index 0000000..16b8724
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlists/create/create-hostoptionlist-dialog.component.html
+@@ -0,0 +1,59 @@
++<form autocomplete="off" #createOptionListForm="ngForm" (ngSubmit)="save()">
++    <h1 mat-dialog-title>{{ "OptionListsCreateAll" | localize }}</h1>
++    <mat-dialog-content>
++      <div class="row-fluid">
++        <div class="col-md-12">
++            <mat-form-field>
++                <input
++                  matInput
++                  name="OptionListKey"
++                  [placeholder]="'Option List Key' | localize"
++                  [(ngModel)]="optionList.optionListKey"
++                  required
++                  maxlength="128"
++                />
++              </mat-form-field>
++          <mat-form-field>
++            <input
++              matInput
++              name="DisplayName"
++              [placeholder]="'Display Name' | localize"
++              [(ngModel)]="optionList.displayName"
++              required
++              maxlength="128"
++            />
++          </mat-form-field>
++          <mat-form-field>
++            <input
++              matInput
++              name="Description"
++              [placeholder]="'Description' | localize"
++              [(ngModel)]="optionList.description"
++              required
++              maxlength="128"
++            />
++          </mat-form-field>
++          <div class="checkbox-wrapper">
++            <mat-checkbox name="IsActive" [(ngModel)]="optionList.isActive">
++              {{ "IsActive" | localize }}
++            </mat-checkbox>
++          </div>
++        </div>
++      </div>
++    </mat-dialog-content>
++    <div mat-dialog-actions align="end">
++      <button mat-button type="button" [disabled]="saving" (click)="close()">
++        {{ "Cancel" | localize }}
++      </button>
++      <button
++        mat-flat-button
++        type="submit"
++        flex="15"
++        color="primary"
++        [disabled]="!createOptionListForm.form.valid || saving"
++      >
++        {{ "Save" | localize }}
++      </button>
++    </div>
++  </form>
++  
+\ No newline at end of file
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlists/create/create-hostoptionlist-dialog.component.less b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlists/create/create-hostoptionlist-dialog.component.less
+new file mode 100644
+index 0000000..ec257bd
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlists/create/create-hostoptionlist-dialog.component.less
+@@ -0,0 +1,7 @@
++mat-form-field {
++    width: 100%;
++}
++
++mat-checkbox {
++    padding-bottom: 5px;
++}
+\ No newline at end of file
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlists/create/create-hostoptionlist-dialog.component.ts b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlists/create/create-hostoptionlist-dialog.component.ts
+new file mode 100644
+index 0000000..57f8269
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlists/create/create-hostoptionlist-dialog.component.ts
+@@ -0,0 +1,48 @@
++import { AppComponentBase } from "@shared/app-component-base";
++import { OnInit, Component, Injector } from "@angular/core";
++import { OptionListCreateOrEditDto, OptionListServiceProxy } from "@shared/service-proxies/service-proxies";
++import { MatDialogRef } from "@angular/material";
++import { finalize } from "rxjs/operators";
++
++@Component({
++    templateUrl: './create-hostoptionlist-dialog.component.html',
++    styleUrls: ['./create-hostoptionlist-dialog.component.less']
++})
++export class HostCreateOptionListDialogComponent extends AppComponentBase implements OnInit 
++{
++    saving = false;
++    optionList: OptionListCreateOrEditDto = new OptionListCreateOrEditDto();
++  
++    constructor(injector: Injector,
++                private _optionListService: OptionListServiceProxy,
++                private _dialogRef: MatDialogRef<HostCreateOptionListDialogComponent>) 
++    {
++        super(injector);
++    }
++  
++    ngOnInit(): void {
++        this.optionList.isActive = true;
++    }
++  
++    save(): void {
++      this.saving = true;
++  
++      this._optionListService
++        .createOrUpdateList(this.optionList)
++        .pipe(
++          finalize(() => {
++            this.saving = false;
++          })
++        )
++        .subscribe(() => {
++          this.notify.info(this.l('SavedSuccessfully'));
++          this.close(true);
++        });
++    }
++  
++    close(result: any): void {
++      this._dialogRef.close(result);
++    }
++}
++
++
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlists/edit/edit-hostoptionlist-dialog.component.html b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlists/edit/edit-hostoptionlist-dialog.component.html
+new file mode 100644
+index 0000000..85f2324
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlists/edit/edit-hostoptionlist-dialog.component.html
+@@ -0,0 +1,62 @@
++<form autocomplete="off" #editOptionListModal="ngForm" (ngSubmit)="save()">
++    <h1 mat-dialog-title>{{titleService.getTitle()}}</h1>
++    <mat-dialog-content style="width:800px;height:250px;">
++      <mat-tab-group>
++        <mat-tab [label]="'Option List Details' | localize">
++          <br />
++          <div class="row-fluid">
++            <div class="col-md-6">
++              <mat-form-field>
++                <input
++                  matInput
++                  name="OptionListKey"
++                  [placeholder]="'Option List Key' | localize"
++                  [(ngModel)]="optionList.optionListKey"
++                  required
++                  maxlength="32"
++                />
++              </mat-form-field>
++              <mat-form-field>
++                <input
++                  matInput
++                  name="DisplayName"
++                  [placeholder]="'Display Name' | localize"
++                  [(ngModel)]="optionList.displayName"
++                  maxlength="50"
++                />
++              </mat-form-field>
++              <mat-form-field>
++                <input
++                  matInput
++                  name="Description"
++                  [placeholder]="'Description' | localize"
++                  [(ngModel)]="optionList.description"
++                  maxlength="50"
++                />
++              </mat-form-field>
++              <div class="checkbox-wrapper">
++                <mat-checkbox name="IsActive" [(ngModel)]="optionList.isActive">
++                  {{ "IsActive" | localize }}
++                </mat-checkbox>
++              </div>
++            </div>
++          </div>
++        </mat-tab>
++      </mat-tab-group>
++    </mat-dialog-content>
++    <div mat-dialog-actions align="end">
++      <button mat-button type="button" [disabled]="saving" (click)="close()">
++        {{ "Cancel" | localize }}
++      </button>
++      <button
++        mat-flat-button
++        type="submit"
++        flex="15"
++        color="primary"
++        [disabled]="!editOptionListModal.form.valid || saving"
++      >
++        {{ "Save" | localize }}
++      </button>
++    </div>
++  </form>
++  
+\ No newline at end of file
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlists/edit/edit-hostoptionlist-dialog.component.less b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlists/edit/edit-hostoptionlist-dialog.component.less
+new file mode 100644
+index 0000000..fc8c206
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlists/edit/edit-hostoptionlist-dialog.component.less
+@@ -0,0 +1,6 @@
++mat-form-field {
++    width: 100%;
++}
++mat-checkbox {
++    padding-bottom: 5px;
++}
+\ No newline at end of file
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlists/edit/edit-hostoptionlist-dialog.component.ts b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlists/edit/edit-hostoptionlist-dialog.component.ts
+new file mode 100644
+index 0000000..f192741
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlists/edit/edit-hostoptionlist-dialog.component.ts
+@@ -0,0 +1,51 @@
++import { Component, Injector, OnInit, Inject, Optional } from '@angular/core';
++import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
++import { finalize } from 'rxjs/operators';
++import { AppComponentBase } from '@shared/app-component-base';
++import { OptionListServiceProxy, OptionListViewDto } from '@shared/service-proxies/service-proxies';
++import { Title } from '@angular/platform-browser';
++
++@Component({
++  templateUrl: './edit-hostoptionlist-dialog.component.html',
++  styleUrls: ['./edit-hostoptionlist-dialog.component.less']
++})
++export class HostEditOptionListDialogComponent extends AppComponentBase implements OnInit {
++    saving = false;
++    optionList: OptionListViewDto = new OptionListViewDto();
++
++    constructor(injector: Injector,
++                private _optionListService: OptionListServiceProxy,
++                private _dialogRef: MatDialogRef<HostEditOptionListDialogComponent>,
++                @Optional() @Inject(MAT_DIALOG_DATA) private _id: number,
++                private titleService: Title) 
++    {
++        super(injector);
++    }
++
++    ngOnInit(): void {
++        this._optionListService.getListById(this._id).subscribe((result: OptionListViewDto) => {
++                    this.optionList = result;
++                    this.titleService.setTitle(this.optionList.displayName);
++                });
++    }
++
++    save(): void {
++        this.saving = true;
++
++        this._optionListService
++                .createOrUpdateList(this.optionList)
++                .pipe(
++                    finalize(() => {
++                    this.saving = false;
++                    })
++                )
++                .subscribe(() => {
++                    this.notify.info(this.l('SavedSuccessfully'));
++                    this.close(true);
++                });
++    }
++
++    close(result: any): void {
++        this._dialogRef.close(result);
++    }
++}
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlists/hostoptionlists.component.html b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlists/hostoptionlists.component.html
+new file mode 100644
+index 0000000..6e4216f
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlists/hostoptionlists.component.html
+@@ -0,0 +1 @@
++<h1>Host Option Lists</h1>
+\ No newline at end of file
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlists/hostoptionlists.component.less b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlists/hostoptionlists.component.less
+new file mode 100644
+index 0000000..e69de29
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlists/hostoptionlists.component.ts b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlists/hostoptionlists.component.ts
+new file mode 100644
+index 0000000..75b9571
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/host/optionlists/hostoptionlists.component.ts
+@@ -0,0 +1,36 @@
++import { Component, Injector } from "@angular/core";
++import { appModuleAnimation } from "@shared/animations/routerTransition";
++import { PagedListingComponentBase, PagedRequestDto } from "@shared/paged-listing-component-base";
++import { OptionListViewDto } from "@shared/service-proxies/service-proxies";
++
++class PagedOptionListRequestDto extends PagedRequestDto {
++    keyword: string;
++    filter: string;
++    sorting: string;
++}
++
++@Component({
++    templateUrl: './hostoptionlists.component.html',
++    animations: [appModuleAnimation()],
++    styleUrls: ['./hostoptionlists.component.less']
++})
++export class HostOptionListsComponent extends PagedListingComponentBase<OptionListViewDto> {
++    optionLists: OptionListViewDto[] = [];
++
++    constructor(
++        injector: Injector,
++    ) {
++        super(injector);
++    }
++
++    protected list(
++            request: PagedOptionListRequestDto, 
++            pageNumber: number, 
++            finishedCallback: Function): void {
++        throw new Error("Method not implemented.");
++    }
++
++    protected delete(entity: OptionListViewDto): void {
++        throw new Error("Method not implemented.");
++    }
++}
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/create/create-optionlistitems-dialog.component.html b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/create/create-optionlistitems-dialog.component.html
+new file mode 100644
+index 0000000..96ede14
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/create/create-optionlistitems-dialog.component.html
+@@ -0,0 +1,64 @@
++<form autocomplete="off" #createOptionListItemsForm="ngForm" (ngSubmit)="save()">
++    <h1 mat-dialog-title>{{ "OptionListItemsCreate" | localize }}</h1>
++    <mat-dialog-content>
++      <div class="row-fluid">
++        <div class="col-md-12">
++            
++            <mat-form-field>
++                <input
++                  matInput
++                  name="OptionListName"
++                  [placeholder]="'Option List Id' | localize"
++                  [(ngModel)]="optionListItem.optionListId"
++                />
++              </mat-form-field>
++          <mat-form-field>
++            <input
++              matInput
++              name="DisplayText"
++              [placeholder]="'Display Text' | localize"
++              [(ngModel)]="optionListItem.displayText"
++              required
++              maxlength="32"
++            />
++          </mat-form-field>
++          <mat-form-field>
++            <input
++              matInput
++              name="AdditionalInfo"
++              [placeholder]="'Additional Info' | localize"
++              [(ngModel)]="optionListItem.additionalInfo"
++              maxlength="128"
++            />
++          </mat-form-field><mat-form-field>
++            <input
++              matInput
++              name="DisplayOrder"
++              [placeholder]="'Display Order' | localize"
++              [(ngModel)]="optionListItem.displayOrder"
++            />
++          </mat-form-field>
++          <div class="checkbox-wrapper">
++            <mat-checkbox name="IsActive" [(ngModel)]="optionListItem.isActive">
++              {{ "IsActive" | localize }}
++            </mat-checkbox>
++          </div>
++        </div>
++      </div>
++    </mat-dialog-content>
++    <div mat-dialog-actions align="end">
++      <button mat-button type="button" [disabled]="saving" (click)="close()">
++        {{ "Cancel" | localize }}
++      </button>
++      <button
++        mat-flat-button
++        type="submit"
++        flex="15"
++        color="primary"
++        [disabled]="!createOptionListItemsForm.form.valid || saving"
++      >
++        {{ "Save" | localize }}
++      </button>
++    </div>
++  </form>
++  
+\ No newline at end of file
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/create/create-optionlistitems-dialog.component.less b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/create/create-optionlistitems-dialog.component.less
+new file mode 100644
+index 0000000..fc8c206
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/create/create-optionlistitems-dialog.component.less
+@@ -0,0 +1,6 @@
++mat-form-field {
++    width: 100%;
++}
++mat-checkbox {
++    padding-bottom: 5px;
++}
+\ No newline at end of file
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/create/create-optionlistitems-dialog.component.ts b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/create/create-optionlistitems-dialog.component.ts
+new file mode 100644
+index 0000000..9512716
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/create/create-optionlistitems-dialog.component.ts
+@@ -0,0 +1,45 @@
++import { Component, Injector, OnInit } from '@angular/core';
++import { MatDialogRef, MatCheckboxChange } from '@angular/material';
++import { finalize } from 'rxjs/operators';
++import * as _ from 'lodash';
++import { AppComponentBase } from '@shared/app-component-base';
++import { OptionListItemCreateOrEditDto, OptionListItemsServiceProxy } from '@shared/service-proxies/service-proxies';
++
++@Component({
++  templateUrl: './create-optionlistitems-dialog.component.html',
++  styleUrls: ['./create-optionlistitems-dialog.component.less']
++})
++export class CreateOptionListItemsDialogComponent extends AppComponentBase implements OnInit {
++    saving = false;
++    optionListItem: OptionListItemCreateOrEditDto = new OptionListItemCreateOrEditDto();
++
++    constructor(injector: Injector,
++                private _optionListItemService: OptionListItemsServiceProxy,
++                private _dialogRef: MatDialogRef<CreateOptionListItemsDialogComponent>) 
++    {
++        super(injector);
++    }
++
++    ngOnInit(): void {
++        this.optionListItem.isActive = true;
++    }
++
++    save(): void {
++        this.saving = true;
++
++        this._optionListItemService.createOrUpdateListItem(this.optionListItem)
++            .pipe(
++                finalize(() => {
++                this.saving = false;
++                })
++            )
++            .subscribe(() => {
++                this.notify.info(this.l('SavedSuccessfully'));
++                this.close(true);
++        });
++    }
++
++    close(result: any): void {
++        this._dialogRef.close(result);
++    }
++}
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/edit/edit-optionlistitems-dialog.component.html b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/edit/edit-optionlistitems-dialog.component.html
+new file mode 100644
+index 0000000..b61c646
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/edit/edit-optionlistitems-dialog.component.html
+@@ -0,0 +1,73 @@
++<form autocomplete="off" #editOptionListItemsModal="ngForm" (ngSubmit)="save()">
++    <h1 mat-dialog-title>{{ titleService.getTitle() }}</h1>
++    <mat-dialog-content style="width:800px;height:250px;">
++      <mat-tab-group>
++        <mat-tab [label]="'Option List Item Details' | localize">
++          <br />
++          <div class="row-fluid">
++            <div class="col-md-6">
++              
++              <mat-form-field>
++                <input
++                  matInput
++                  name="OptionListId"
++                  [placeholder]="'Option List Id' | localize"
++                  [(ngModel)]="optionListItem.optionListId"
++                />
++              </mat-form-field>
++              <mat-form-field>
++                <input
++                  matInput
++                  name="DisplayText"
++                  [placeholder]="'Display Text' | localize"
++                  [(ngModel)]="optionListItem.displayText"
++                  required
++                  maxlength="32"
++                />
++              </mat-form-field>
++              <mat-form-field>
++                <input
++                  matInput
++                  name="AdditionalInfo"
++                  [placeholder]="'Additional Info' | localize"
++                  [(ngModel)]="optionListItem.additionalInfo"
++                  maxlength="128"
++                />
++              </mat-form-field>
++              <mat-form-field>
++                <input
++                  matInput
++                  name="DisplayOrder"
++                  [placeholder]="'Display Order' | localize"
++                  [(ngModel)]="optionListItem.displayOrder"
++                  maxlength="50"
++                />
++              </mat-form-field>
++              <div class="checkbox-wrapper">
++                <mat-checkbox name="IsActive" [(ngModel)]="optionListItem.isActive">
++                  {{ "IsActive" | localize }}
++                </mat-checkbox>
++              </div>
++            </div>
++            <div class="col-md-6">
++            </div>
++          </div>
++        </mat-tab>
++      </mat-tab-group>
++    </mat-dialog-content>
++    <div mat-dialog-actions align="end">
++      <button mat-button type="button" [disabled]="saving" (click)="close()">
++        {{ "Cancel" | localize }}
++      </button>
++      <button
++        mat-flat-button
++        type="submit"
++        flex="15"
++        color="primary"
++        [disabled]="!editOptionListItemsModal.form.valid || saving"
++      >
++        {{ "Save" | localize }}
++      </button>
++    </div>
++  </form>
++  
+\ No newline at end of file
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/edit/edit-optionlistitems-dialog.component.less b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/edit/edit-optionlistitems-dialog.component.less
+new file mode 100644
+index 0000000..fc8c206
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/edit/edit-optionlistitems-dialog.component.less
+@@ -0,0 +1,6 @@
++mat-form-field {
++    width: 100%;
++}
++mat-checkbox {
++    padding-bottom: 5px;
++}
+\ No newline at end of file
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/edit/edit-optionlistitems-dialog.component.ts b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/edit/edit-optionlistitems-dialog.component.ts
+new file mode 100644
+index 0000000..846d087
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/edit/edit-optionlistitems-dialog.component.ts
+@@ -0,0 +1,50 @@
++import { Component, Injector, OnInit, Inject, Optional } from '@angular/core';
++import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
++import { finalize } from 'rxjs/operators';
++import { AppComponentBase } from '@shared/app-component-base';
++import { OptionListItemsServiceProxy, OptionListItemViewDto } from '@shared/service-proxies/service-proxies';
++import { Title } from '@angular/platform-browser';
++
++@Component({
++  templateUrl: './edit-optionlistitems-dialog.component.html',
++  styleUrls: ['./edit-optionlistitems-dialog.component.less']
++})
++export class EditOptionListItemsDialogComponent extends AppComponentBase implements OnInit {
++    saving = false;
++    optionListItem: OptionListItemViewDto = new OptionListItemViewDto();
++
++    constructor (injector: Injector,
++            private _optionListItemService: OptionListItemsServiceProxy,
++            private _dialogRef: MatDialogRef<EditOptionListItemsDialogComponent>,
++            @Optional() @Inject(MAT_DIALOG_DATA) private _id: number,
++            private titleService: Title) 
++    {
++        super(injector);
++    }
++
++    ngOnInit(): void {
++        this._optionListItemService.getListItemById(this._id).subscribe((result: OptionListItemViewDto) => {
++                this.optionListItem = result;
++                this.titleService.setTitle(this.optionListItem.displayText);
++        });
++    }
++
++    save(): void {
++        this.saving = true;
++
++        this._optionListItemService.createOrUpdateListItem(this.optionListItem)
++            .pipe(
++                finalize(() => {
++                this.saving = false;
++                })
++            )
++            .subscribe(() => {
++                this.notify.info(this.l('SavedSuccessfully'));
++            this.close(true);
++        });
++    }
++
++    close(result: any): void {
++        this._dialogRef.close(result);
++    }
++}
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/optionlistitems.component.html b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/optionlistitems.component.html
+new file mode 100644
+index 0000000..87311af
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/optionlistitems.component.html
+@@ -0,0 +1 @@
++<h1>Option List Items Component</h1>
+\ No newline at end of file
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/optionlistitems.component.less b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/optionlistitems.component.less
+new file mode 100644
+index 0000000..e69de29
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/optionlistitems.component.ts b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/optionlistitems.component.ts
+new file mode 100644
+index 0000000..1256229
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/optionlistitems.component.ts
+@@ -0,0 +1,36 @@
++import { Component, Injector } from "@angular/core";
++import { appModuleAnimation } from "@shared/animations/routerTransition";
++import { PagedListingComponentBase, PagedRequestDto } from "@shared/paged-listing-component-base";
++import { OptionListItemViewDto, OptionListItemsServiceProxy } from "@shared/service-proxies/service-proxies";
++import { MatDialog } from "@angular/material";
++
++class PagedOptionListItemRequestDto extends PagedRequestDto {
++    filter: string;
++    key: string;
++    sorting: string;
++}
++
++@Component({
++    templateUrl: './optionlistitems.component.html',
++    styleUrls: ['./optionlistitems.component.less'],
++    animations: [appModuleAnimation()]
++})
++export class OptionListItemsComponent extends PagedListingComponentBase<OptionListItemViewDto> {
++
++    optionListItems: OptionListItemViewDto[] = [];
++
++    constructor(injector: Injector,
++                private _optionListItemService: OptionListItemsServiceProxy,
++                private _dialog: MatDialog) 
++    {
++        super(injector);
++    }
++
++    protected list(request: PagedOptionListItemRequestDto, pageNumber: number, finishedCallback: Function): void {
++        throw new Error("Method not implemented.");
++    }
++
++    protected delete(entity: OptionListItemViewDto): void {
++        throw new Error("Method not implemented.");
++    }
++}
+\ No newline at end of file
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlists/create/create-optionlist-dialog.component.html b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlists/create/create-optionlist-dialog.component.html
+new file mode 100644
+index 0000000..a7a675e
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlists/create/create-optionlist-dialog.component.html
+@@ -0,0 +1,58 @@
++<form autocomplete="off" #createOptionListForm="ngForm" (ngSubmit)="save()">
++    <h1 mat-dialog-title>{{ "OptionListsCreate" | localize }}</h1>
++  <mat-dialog-content>
++    <div class="row-fluid">
++      <div class="col-md-12">
++          <mat-form-field>
++              <input
++                matInput
++                name="OptionListKey"
++                [placeholder]="'Option List Key' | localize"
++                [(ngModel)]="optionList.optionListKey"
++                required
++                maxlength="128"
++              />
++            </mat-form-field>
++        <mat-form-field>
++          <input
++            matInput
++            name="DisplayName"
++            [placeholder]="'Display Name' | localize"
++            [(ngModel)]="optionList.displayName"
++            required
++            maxlength="128"
++          />
++        </mat-form-field>
++        <mat-form-field>
++          <input
++            matInput
++            name="Description"
++            [placeholder]="'Description' | localize"
++            [(ngModel)]="optionList.description"
++            required
++            maxlength="128"
++          />
++        </mat-form-field>
++        <div class="checkbox-wrapper">
++          <mat-checkbox name="IsActive" [(ngModel)]="optionList.isActive">
++            {{ "IsActive" | localize }}
++          </mat-checkbox>
++        </div>
++      </div>
++    </div>
++  </mat-dialog-content>
++  <div mat-dialog-actions align="end">
++    <button mat-button type="button" [disabled]="saving" (click)="close()">
++      {{ "Cancel" | localize }}
++    </button>
++    <button
++      mat-flat-button
++      type="submit"
++      flex="15"
++      color="primary"
++      [disabled]="!createOptionListForm.form.valid || saving"
++    >
++      {{ "Save" | localize }}
++    </button>
++  </div>
++</form>
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlists/create/create-optionlist-dialog.component.less b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlists/create/create-optionlist-dialog.component.less
+new file mode 100644
+index 0000000..ec257bd
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlists/create/create-optionlist-dialog.component.less
+@@ -0,0 +1,7 @@
++mat-form-field {
++    width: 100%;
++}
++
++mat-checkbox {
++    padding-bottom: 5px;
++}
+\ No newline at end of file
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlists/create/create-optionlist-dialog.component.ts b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlists/create/create-optionlist-dialog.component.ts
+new file mode 100644
+index 0000000..0893379
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlists/create/create-optionlist-dialog.component.ts
+@@ -0,0 +1,45 @@
++import { Component, Injector, OnInit } from '@angular/core';
++import { MatDialogRef, MatCheckboxChange } from '@angular/material';
++import { finalize } from 'rxjs/operators';
++import * as _ from 'lodash';
++import { AppComponentBase } from '@shared/app-component-base';
++import { OptionListCreateOrEditDto, OptionListServiceProxy } from '@shared/service-proxies/service-proxies';
++
++@Component({
++  templateUrl: './create-optionlist-dialog.component.html',
++  styleUrls: ['./create-optionlist-dialog.component.less']
++})
++export class CreateOptionListDialogComponent extends AppComponentBase implements OnInit {
++    saving = false;
++    optionList: OptionListCreateOrEditDto = new OptionListCreateOrEditDto();
++
++    constructor(injector: Injector,
++                    private _optionListService: OptionListServiceProxy,
++                    private _dialogRef: MatDialogRef<CreateOptionListDialogComponent>) 
++    {
++        super(injector);
++    }
++
++    ngOnInit(): void {
++        this.optionList.isActive = true;
++    }
++
++    save(): void {
++        this.saving = true;
++
++        this._optionListService.createOrUpdateList(this.optionList)
++                .pipe(
++                    finalize(() => {
++                        this.saving = false;
++                    })
++                )
++                .subscribe(() => {
++                    this.notify.info(this.l('SavedSuccessfully'));
++                    this.close(true);
++        });
++    }
++
++    close(result: any): void {
++        this._dialogRef.close(result);
++    }
++}
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlists/edit/edit-optionlist-dialog.component.html b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlists/edit/edit-optionlist-dialog.component.html
+new file mode 100644
+index 0000000..4d47439
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlists/edit/edit-optionlist-dialog.component.html
+@@ -0,0 +1,62 @@
++<form autocomplete="off" #editOptionListModal="ngForm" (ngSubmit)="save()">
++    <h1 mat-dialog-title>{{ titleService.getTitle() }}</h1>
++    <mat-dialog-content style="width:800px;height:250px;">
++      <mat-tab-group>
++        <mat-tab [label]="'Option List Details' | localize">
++          <br />
++          <div class="row-fluid">
++            <div class="col-md-6">
++              <mat-form-field>
++                <input
++                  matInput
++                  name="OptionListKey"
++                  [placeholder]="'Option List Key' | localize"
++                  [(ngModel)]="optionList.optionListKey"
++                  required
++                  maxlength="32"
++                />
++              </mat-form-field>
++              <mat-form-field>
++                <input
++                  matInput
++                  name="DisplayName"
++                  [placeholder]="'Display Name' | localize"
++                  [(ngModel)]="optionList.displayName"
++                  maxlength="50"
++                />
++              </mat-form-field>
++              <mat-form-field>
++                <input
++                  matInput
++                  name="Description"
++                  [placeholder]="'Description' | localize"
++                  [(ngModel)]="optionList.description"
++                  maxlength="50"
++                />
++              </mat-form-field>
++              <div class="checkbox-wrapper">
++                <mat-checkbox name="IsActive" [(ngModel)]="optionList.isActive">
++                  {{ "IsActive" | localize }}
++                </mat-checkbox>
++              </div>
++            </div>
++          </div>
++        </mat-tab>
++      </mat-tab-group>
++    </mat-dialog-content>
++    <div mat-dialog-actions align="end">
++      <button mat-button type="button" [disabled]="saving" (click)="close()">
++        {{ "Cancel" | localize }}
++      </button>
++      <button
++        mat-flat-button
++        type="submit"
++        flex="15"
++        color="primary"
++        [disabled]="!editOptionListModal.form.valid || saving"
++      >
++        {{ "Save" | localize }}
++      </button>
++    </div>
++  </form>
++  
+\ No newline at end of file
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlists/edit/edit-optionlist-dialog.component.less b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlists/edit/edit-optionlist-dialog.component.less
+new file mode 100644
+index 0000000..ec257bd
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlists/edit/edit-optionlist-dialog.component.less
+@@ -0,0 +1,7 @@
++mat-form-field {
++    width: 100%;
++}
++
++mat-checkbox {
++    padding-bottom: 5px;
++}
+\ No newline at end of file
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlists/edit/edit-optionlist-dialog.component.ts b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlists/edit/edit-optionlist-dialog.component.ts
+new file mode 100644
+index 0000000..a1e8977
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlists/edit/edit-optionlist-dialog.component.ts
+@@ -0,0 +1,51 @@
++import { Component, OnInit, Injector, Optional, Inject } from "@angular/core";
++import { AppComponentBase } from "@shared/app-component-base";
++import { OptionListViewDto, OptionListServiceProxy } from "@shared/service-proxies/service-proxies";
++import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material";
++import { Title } from "@angular/platform-browser";
++import { finalize } from "rxjs/operators";
++
++@Component({
++    templateUrl: './edit-optionlist-dialog.component.html',
++    styleUrls: ['./edit-optionlist-dialog.component.less']
++})
++export class EditOptionListDialogComponent extends AppComponentBase implements OnInit {
++    saving = false;
++    optionList: OptionListViewDto = new OptionListViewDto();
++  
++    constructor(injector: Injector,
++                    private _optionListService: OptionListServiceProxy,
++                    private _dialogRef: MatDialogRef<EditOptionListDialogComponent>,
++                    @Optional() @Inject(MAT_DIALOG_DATA) private _id: number,
++                    private titleService: Title) 
++    {
++      super(injector);
++    }
++  
++    ngOnInit(): void {
++        this._optionListService.getListById(this._id).subscribe((result: OptionListViewDto) => {
++                this.optionList = result;
++                this.titleService.setTitle(this.optionList.displayName);
++        });
++    }
++  
++    save(): void {
++        this.saving = true;
++  
++        this._optionListService.createOrUpdateList(this.optionList)
++            .pipe(
++                finalize(() => {
++                    this.saving = false;
++                })
++            )
++            .subscribe(() => {
++                this.notify.info(this.l('SavedSuccessfully'));
++                this.close(true);
++        });
++    }
++  
++    close(result: any): void {
++        this._dialogRef.close(result);
++    }
++}
++  
+\ No newline at end of file
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlists/optionlists.component.html b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlists/optionlists.component.html
+new file mode 100644
+index 0000000..6a2348b
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlists/optionlists.component.html
+@@ -0,0 +1 @@
++<h1>Tenant Option Lists</h1>
+\ No newline at end of file
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlists/optionlists.component.less b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlists/optionlists.component.less
+new file mode 100644
+index 0000000..e69de29
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlists/optionlists.component.ts b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlists/optionlists.component.ts
+new file mode 100644
+index 0000000..adcfb20
+--- /dev/null
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlists/optionlists.component.ts
+@@ -0,0 +1,36 @@
++import { Component, Injector } from "@angular/core";
++import { appModuleAnimation } from "@shared/animations/routerTransition";
++import { PagedListingComponentBase, PagedRequestDto } from "@shared/paged-listing-component-base";
++import { OptionListViewDto } from "@shared/service-proxies/service-proxies";
++
++class PagedOptionListRequestDto extends PagedRequestDto {
++    keyword: string;
++    filter: string;
++    sorting: string;
++}
++
++@Component({
++    templateUrl: './optionlists.component.html',
++    animations: [appModuleAnimation()],
++    styleUrls: ['./optionlists.component.less']
++})
++export class OptionListsComponent extends PagedListingComponentBase<OptionListViewDto> {
++
++    optionLists: OptionListViewDto[] = [];
++
++    constructor(
++        injector: Injector,
++    ) {
++        super(injector);
++    }
++
++    protected list(request: PagedOptionListRequestDto
++                    , pageNumber: number
++                    , finishedCallback: Function): void {
++        throw new Error("Method not implemented.");
++    }
++    
++    protected delete(entity: OptionListViewDto): void {
++        throw new Error("Method not implemented.");
++    }
++}
+\ No newline at end of file

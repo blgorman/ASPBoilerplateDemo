@@ -37,6 +37,22 @@ import { CreateUserDialogComponent } from '@app/users/create-user/create-user-di
 import { EditUserDialogComponent } from '@app/users/edit-user/edit-user-dialog.component';
 import { ChangePasswordComponent } from './users/change-password/change-password.component';
 import { ResetPasswordDialogComponent } from './users/reset-password/reset-password.component';
+//option lists tenant level
+import { OptionListsComponent } from './optionlists/optionlists.component';
+import { CreateOptionListDialogComponent } from './optionlists/create/create-optionlist-dialog.component';
+import { EditOptionListDialogComponent } from './optionlists/edit/edit-optionlist-dialog.component';
+// option list items
+import { OptionListItemsComponent } from './optionlistitems/optionlistitems.component';
+import { CreateOptionListItemsDialogComponent } from './optionlistitems/create/create-optionlistitems-dialog.component';
+import { EditOptionListItemsDialogComponent } from './optionlistitems/edit/edit-optionlistitems-dialog.component';
+//host lists
+import { HostOptionListsComponent } from './host/optionlists/hostoptionlists.component';
+import { HostCreateOptionListDialogComponent } from './host/optionlists/create/create-hostoptionlist-dialog.component';
+import { HostEditOptionListDialogComponent } from './host/optionlists/edit/edit-hostoptionlist-dialog.component';
+//host list items
+import { HostOptionListItemsComponent } from './host/optionlistitems/optionlistitems.component';
+import { HostCreateOptionListItemsDialogComponent } from './host/optionlistitems/create/create-optionlistitems-dialog.component';
+import { HostEditOptionListItemsDialogComponent } from './host/optionlistitems/edit/edit-optionlistitems-dialog.component';
 
 @NgModule({
   declarations: [
@@ -62,7 +78,23 @@ import { ResetPasswordDialogComponent } from './users/reset-password/reset-passw
     CreateUserDialogComponent,
     EditUserDialogComponent,
     ChangePasswordComponent,
-    ResetPasswordDialogComponent
+    ResetPasswordDialogComponent,
+    //option lists tenant level
+    OptionListsComponent,
+    CreateOptionListDialogComponent,
+    EditOptionListDialogComponent,
+    // option list items
+    OptionListItemsComponent,
+    CreateOptionListItemsDialogComponent,
+    EditOptionListItemsDialogComponent,
+    //host option lists
+    HostOptionListsComponent,
+    HostCreateOptionListDialogComponent,
+    HostEditOptionListDialogComponent,
+    //host option list items
+    HostOptionListItemsComponent,
+    HostCreateOptionListItemsDialogComponent,
+    HostEditOptionListItemsDialogComponent
   ],
   imports: [
     CommonModule,
@@ -88,7 +120,23 @@ import { ResetPasswordDialogComponent } from './users/reset-password/reset-passw
     // users
     CreateUserDialogComponent,
     EditUserDialogComponent,
-    ResetPasswordDialogComponent
+    ResetPasswordDialogComponent,
+    //option lists tenant level
+    OptionListsComponent,
+    CreateOptionListDialogComponent,
+    EditOptionListDialogComponent,
+    // option list items
+    OptionListItemsComponent,
+    CreateOptionListItemsDialogComponent,
+    EditOptionListItemsDialogComponent,
+    //host option lists
+    HostOptionListsComponent,
+    HostCreateOptionListDialogComponent,
+    HostEditOptionListDialogComponent,
+    //host option list items
+    HostOptionListItemsComponent,
+    HostCreateOptionListItemsDialogComponent,
+    HostEditOptionListItemsDialogComponent
   ]
 })
 export class AppModule {}
