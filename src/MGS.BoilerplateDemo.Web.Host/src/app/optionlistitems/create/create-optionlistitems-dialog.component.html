@@ -1,0 +1,64 @@
+<form autocomplete="off" #createOptionListItemsForm="ngForm" (ngSubmit)="save()">
+    <h1 mat-dialog-title>{{ "OptionListItemsCreate" | localize }}</h1>
+    <mat-dialog-content>
+      <div class="row-fluid">
+        <div class="col-md-12">
+            
+            <mat-form-field>
+                <input
+                  matInput
+                  name="OptionListName"
+                  [placeholder]="'Option List Id' | localize"
+                  [(ngModel)]="optionListItem.optionListId"
+                />
+              </mat-form-field>
+          <mat-form-field>
+            <input
+              matInput
+              name="DisplayText"
+              [placeholder]="'Display Text' | localize"
+              [(ngModel)]="optionListItem.displayText"
+              required
+              maxlength="32"
+            />
+          </mat-form-field>
+          <mat-form-field>
+            <input
+              matInput
+              name="AdditionalInfo"
+              [placeholder]="'Additional Info' | localize"
+              [(ngModel)]="optionListItem.additionalInfo"
+              maxlength="128"
+            />
+          </mat-form-field><mat-form-field>
+            <input
+              matInput
+              name="DisplayOrder"
+              [placeholder]="'Display Order' | localize"
+              [(ngModel)]="optionListItem.displayOrder"
+            />
+          </mat-form-field>
+          <div class="checkbox-wrapper">
+            <mat-checkbox name="IsActive" [(ngModel)]="optionListItem.isActive">
+              {{ "IsActive" | localize }}
+            </mat-checkbox>
+          </div>
+        </div>
+      </div>
+    </mat-dialog-content>
+    <div mat-dialog-actions align="end">
+      <button mat-button type="button" [disabled]="saving" (click)="close()">
+        {{ "Cancel" | localize }}
+      </button>
+      <button
+        mat-flat-button
+        type="submit"
+        flex="15"
+        color="primary"
+        [disabled]="!createOptionListItemsForm.form.valid || saving"
+      >
+        {{ "Save" | localize }}
+      </button>
+    </div>
+  </form>
+  
