@@ -3,15 +3,11 @@
     <mat-dialog-content>
       <div class="row-fluid">
         <div class="col-md-12">
-            
-            <mat-form-field>
-                <input
-                  matInput
-                  name="OptionListName"
-                  [placeholder]="'Option List Id' | localize"
-                  [(ngModel)]="optionListItem.optionListId"
-                />
-              </mat-form-field>
+          <mat-form-field>
+            <mat-select name="OptionListName" [(ngModel)]="optionListItem.optionListId" placeholder="Option List" required>
+              <mat-option *ngFor="let optionList of optionLists" [value]="optionList.id">{{ optionList.displayName }}</mat-option>
+            </mat-select>
+          </mat-form-field>
           <mat-form-field>
             <input
               matInput
