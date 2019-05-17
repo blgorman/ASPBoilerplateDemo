@@ -1,0 +1,265 @@
+diff --git a/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/Dtos/OptionListItemViewDto.cs b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/Dtos/OptionListItemViewDto.cs
+index 41ee1ac..4981e49 100644
+--- a/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/Dtos/OptionListItemViewDto.cs
++++ b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/Dtos/OptionListItemViewDto.cs
+@@ -15,6 +15,8 @@ namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems.Dtos
+         [JsonIgnore]
+         public OptionListViewDto OptionList { get; set; } = new OptionListViewDto();
+ 
++        public string OptionListDisplayName => OptionList?.DisplayName;
++
+         [Required]
+         [MaxLength(OptionListItem.MaxItemDisplayTextLength)]
+         public string DisplayText { get; set; }
+diff --git a/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/OptionListItemsAppService.cs b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/OptionListItemsAppService.cs
+index 10e16ab..0e2c984 100644
+--- a/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/OptionListItemsAppService.cs
++++ b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/OptionListItemsAppService.cs
+@@ -42,7 +42,7 @@ namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
+                 var tenantId = AbpSession.TenantId; //is null if on host
+ 
+                 var filteredResults = await _optionListItemRepository.GetAll()
+-                                                    //.Include(x => x.OptionList)
++                                                    .Include(x => x.OptionList)
+                                                     .WhereIf(!string.IsNullOrWhiteSpace(input.Filter),
+                                                         oli => oli.DisplayText != null && oli.DisplayText.Contains(input.Filter
+                                                                     , StringComparison.CurrentCultureIgnoreCase)
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/create/create-optionlistitems-dialog.component.html b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/create/create-optionlistitems-dialog.component.html
+index 96ede14..23c4928 100644
+--- a/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/create/create-optionlistitems-dialog.component.html
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/create/create-optionlistitems-dialog.component.html
+@@ -3,15 +3,11 @@
+     <mat-dialog-content>
+       <div class="row-fluid">
+         <div class="col-md-12">
+-            
+-            <mat-form-field>
+-                <input
+-                  matInput
+-                  name="OptionListName"
+-                  [placeholder]="'Option List Id' | localize"
+-                  [(ngModel)]="optionListItem.optionListId"
+-                />
+-              </mat-form-field>
++          <mat-form-field>
++            <mat-select name="OptionListName" [(ngModel)]="optionListItem.optionListId" placeholder="Option List" required>
++              <mat-option *ngFor="let optionList of optionLists" [value]="optionList.id">{{ optionList.displayName }}</mat-option>
++            </mat-select>
++          </mat-form-field>
+           <mat-form-field>
+             <input
+               matInput
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/create/create-optionlistitems-dialog.component.ts b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/create/create-optionlistitems-dialog.component.ts
+index 9512716..98d5a79 100644
+--- a/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/create/create-optionlistitems-dialog.component.ts
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/create/create-optionlistitems-dialog.component.ts
+@@ -3,7 +3,7 @@ import { MatDialogRef, MatCheckboxChange } from '@angular/material';
+ import { finalize } from 'rxjs/operators';
+ import * as _ from 'lodash';
+ import { AppComponentBase } from '@shared/app-component-base';
+-import { OptionListItemCreateOrEditDto, OptionListItemsServiceProxy } from '@shared/service-proxies/service-proxies';
++import { OptionListItemCreateOrEditDto, OptionListItemsServiceProxy, OptionListServiceProxy, PagedResultDtoOfOptionListViewDto, OptionListViewDto } from '@shared/service-proxies/service-proxies';
+ 
+ @Component({
+   templateUrl: './create-optionlistitems-dialog.component.html',
+@@ -12,16 +12,32 @@ import { OptionListItemCreateOrEditDto, OptionListItemsServiceProxy } from '@sha
+ export class CreateOptionListItemsDialogComponent extends AppComponentBase implements OnInit {
+     saving = false;
+     optionListItem: OptionListItemCreateOrEditDto = new OptionListItemCreateOrEditDto();
++    optionLists: OptionListViewDto[] = [];
+ 
+     constructor(injector: Injector,
+                 private _optionListItemService: OptionListItemsServiceProxy,
++                private _optionListService: OptionListServiceProxy,
+                 private _dialogRef: MatDialogRef<CreateOptionListItemsDialogComponent>) 
+     {
+         super(injector);
+     }
+ 
+     ngOnInit(): void {
++        this.loadLists();
+         this.optionListItem.isActive = true;
++        this.optionListItem.optionListId = -1;   
++    }
++
++    loadLists() {
++        this._optionListService
++            .getAll('', '', '', 0, 1000)
++            .pipe(
++                finalize(() => {
++                })
++            )
++            .subscribe((result: PagedResultDtoOfOptionListViewDto) => {
++                this.optionLists = result.items;
++            });
+     }
+ 
+     save(): void {
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/edit/edit-optionlistitems-dialog.component.html b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/edit/edit-optionlistitems-dialog.component.html
+index b61c646..07baec8 100644
+--- a/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/edit/edit-optionlistitems-dialog.component.html
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/edit/edit-optionlistitems-dialog.component.html
+@@ -6,14 +6,10 @@
+           <br />
+           <div class="row-fluid">
+             <div class="col-md-6">
+-              
+               <mat-form-field>
+-                <input
+-                  matInput
+-                  name="OptionListId"
+-                  [placeholder]="'Option List Id' | localize"
+-                  [(ngModel)]="optionListItem.optionListId"
+-                />
++                <mat-select name="OptionListName" [(ngModel)]="optionListItem.optionListId" placeholder="Option List" required>
++                  <mat-option *ngFor="let optionList of optionLists" [value]="optionList.id">{{ optionList.displayName }}</mat-option>
++                </mat-select>
+               </mat-form-field>
+               <mat-form-field>
+                 <input
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/edit/edit-optionlistitems-dialog.component.ts b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/edit/edit-optionlistitems-dialog.component.ts
+index 846d087..9e558af 100644
+--- a/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/edit/edit-optionlistitems-dialog.component.ts
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/edit/edit-optionlistitems-dialog.component.ts
+@@ -2,7 +2,7 @@ import { Component, Injector, OnInit, Inject, Optional } from '@angular/core';
+ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+ import { finalize } from 'rxjs/operators';
+ import { AppComponentBase } from '@shared/app-component-base';
+-import { OptionListItemsServiceProxy, OptionListItemViewDto } from '@shared/service-proxies/service-proxies';
++import { OptionListItemsServiceProxy, OptionListItemViewDto, OptionListViewDto, OptionListServiceProxy, PagedResultDtoOfOptionListViewDto } from '@shared/service-proxies/service-proxies';
+ import { Title } from '@angular/platform-browser';
+ 
+ @Component({
+@@ -12,10 +12,12 @@ import { Title } from '@angular/platform-browser';
+ export class EditOptionListItemsDialogComponent extends AppComponentBase implements OnInit {
+     saving = false;
+     optionListItem: OptionListItemViewDto = new OptionListItemViewDto();
++    optionLists: OptionListViewDto[] = [];
+ 
+     constructor (injector: Injector,
+             private _optionListItemService: OptionListItemsServiceProxy,
+             private _dialogRef: MatDialogRef<EditOptionListItemsDialogComponent>,
++            private _optionListService: OptionListServiceProxy,
+             @Optional() @Inject(MAT_DIALOG_DATA) private _id: number,
+             private titleService: Title) 
+     {
+@@ -23,12 +25,36 @@ export class EditOptionListItemsDialogComponent extends AppComponentBase impleme
+     }
+ 
+     ngOnInit(): void {
+-        this._optionListItemService.getListItemById(this._id).subscribe((result: OptionListItemViewDto) => {
++        this._optionListItemService.getListItemById(this._id)
++            .pipe(
++                finalize(() => {
++                    this.loadLists();
++                })
++            )
++            .subscribe((result: OptionListItemViewDto) => {
+                 this.optionListItem = result;
+                 this.titleService.setTitle(this.optionListItem.displayText);
+         });
+     }
+ 
++    loadLists() {
++        this._optionListService
++            .getAll('', '', '', 0, 1000)
++            .pipe(
++                finalize(() => {
++                    // this.optionLists.forEach((option) => {
++                    //     if (option.id == this.optionListItem.optionListId)
++                    //     {
++                    //         this.selectedOptionList = option;
++                    //     }
++                    // });
++                })
++            )
++            .subscribe((result: PagedResultDtoOfOptionListViewDto) => {
++                this.optionLists = result.items;
++            });
++    }
++
+     save(): void {
+         this.saving = true;
+ 
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/optionlistitems.component.html b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/optionlistitems.component.html
+index 8542c36..e0ec1ae 100644
+--- a/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/optionlistitems.component.html
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlistitems/optionlistitems.component.html
+@@ -25,7 +25,8 @@
+           <table class="table table-hover table-striped" [busy]="isTableLoading">
+             <thead>
+               <tr>
+-                <th>{{ "Option List Id" | localize }}</th>
++                <th></th>
++                <th>{{ "Option List Name" | localize }}</th>
+                 <th>{{ "Name" | localize }}</th>
+                 <th>{{ "Additional Info" | localize }}</th>
+                 <th>{{ "Display Order" | localize }}</th>
+@@ -48,7 +49,8 @@
+                         })
+                 "
+               >
+-                <td>{{ optionListItem.optionListId }}</td>
++                <td><input type="hidden" value="optionListItem.optionListId"></td>
++                <td>{{ optionListItem.optionListDisplayName }}</td>
+                 <td>{{ optionListItem.displayText }}</td>
+                 <td>{{ optionListItem.additionalInfo }}</td>
+                 <td>{{ optionListItem.displayOrder }}</td>
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlists/optionlists.component.html b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlists/optionlists.component.html
+index a8c029e..399a91e 100644
+--- a/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlists/optionlists.component.html
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/optionlists/optionlists.component.html
+@@ -25,7 +25,7 @@
+           <table class="table table-hover table-striped" [busy]="isTableLoading">
+             <thead>
+               <tr>
+-                <th>{{ "Option List Id" | localize }}</th>
++                <!-- <th>{{ "Option List Id" | localize }}</th> -->
+                 <th>{{ "Option List Key" | localize }}</th>
+                 <th>{{ "Name" | localize }}</th>
+                 <th>{{ "Description" | localize }}</th>
+@@ -48,7 +48,7 @@
+                         })
+                 "
+               >
+-                <td>{{ optionList.id }}</td>
++                <!-- <td>{{ optionList.id }}</td> -->
+                 <td>{{ optionList.optionListKey }}</td>
+                 <td>{{ optionList.displayName }}</td>
+                 <td>{{ optionList.description }}</td>
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/shared/service-proxies/service-proxies.ts b/src/MGS.BoilerplateDemo.Web.Host/src/shared/service-proxies/service-proxies.ts
+index 7aae9c2..0ab397c 100644
+--- a/src/MGS.BoilerplateDemo.Web.Host/src/shared/service-proxies/service-proxies.ts
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/shared/service-proxies/service-proxies.ts
+@@ -3560,6 +3560,7 @@ export interface IOptionListViewDto {
+ 
+ export class OptionListItemViewDto implements IOptionListItemViewDto {
+     optionListId: number | undefined;
++    optionListDisplayName: string | undefined;
+     displayText: string;
+     additionalInfo: string | undefined;
+     displayOrder: number | undefined;
+@@ -3585,6 +3586,7 @@ export class OptionListItemViewDto implements IOptionListItemViewDto {
+     init(data?: any) {
+         if (data) {
+             this.optionListId = data["optionListId"];
++            this.optionListDisplayName = data["optionListDisplayName"];
+             this.displayText = data["displayText"];
+             this.additionalInfo = data["additionalInfo"];
+             this.displayOrder = data["displayOrder"];
+@@ -3610,6 +3612,7 @@ export class OptionListItemViewDto implements IOptionListItemViewDto {
+     toJSON(data?: any) {
+         data = typeof data === 'object' ? data : {};
+         data["optionListId"] = this.optionListId;
++        data["optionListDisplayName"] = this.optionListDisplayName;
+         data["displayText"] = this.displayText;
+         data["additionalInfo"] = this.additionalInfo;
+         data["displayOrder"] = this.displayOrder;
+@@ -3635,6 +3638,7 @@ export class OptionListItemViewDto implements IOptionListItemViewDto {
+ 
+ export interface IOptionListItemViewDto {
+     optionListId: number | undefined;
++    optionListDisplayName: string | undefined;
+     displayText: string;
+     additionalInfo: string | undefined;
+     displayOrder: number | undefined;
