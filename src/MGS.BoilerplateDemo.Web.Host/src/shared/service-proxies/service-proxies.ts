@@ -3560,6 +3560,7 @@ export interface IOptionListViewDto {
 
 export class OptionListItemViewDto implements IOptionListItemViewDto {
     optionListId: number | undefined;
+    optionListDisplayName: string | undefined;
     displayText: string;
     additionalInfo: string | undefined;
     displayOrder: number | undefined;
@@ -3585,6 +3586,7 @@ export class OptionListItemViewDto implements IOptionListItemViewDto {
     init(data?: any) {
         if (data) {
             this.optionListId = data["optionListId"];
+            this.optionListDisplayName = data["optionListDisplayName"];
             this.displayText = data["displayText"];
             this.additionalInfo = data["additionalInfo"];
             this.displayOrder = data["displayOrder"];
@@ -3610,6 +3612,7 @@ export class OptionListItemViewDto implements IOptionListItemViewDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["optionListId"] = this.optionListId;
+        data["optionListDisplayName"] = this.optionListDisplayName;
         data["displayText"] = this.displayText;
         data["additionalInfo"] = this.additionalInfo;
         data["displayOrder"] = this.displayOrder;
@@ -3635,6 +3638,7 @@ export class OptionListItemViewDto implements IOptionListItemViewDto {
 
 export interface IOptionListItemViewDto {
     optionListId: number | undefined;
+    optionListDisplayName: string | undefined;
     displayText: string;
     additionalInfo: string | undefined;
     displayOrder: number | undefined;

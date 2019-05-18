@@ -6,14 +6,10 @@
           <br />
           <div class="row-fluid">
             <div class="col-md-6">
-              
               <mat-form-field>
-                <input
-                  matInput
-                  name="OptionListId"
-                  [placeholder]="'Option List Id' | localize"
-                  [(ngModel)]="optionListItem.optionListId"
-                />
+                <mat-select name="OptionListName" [(ngModel)]="optionListItem.optionListId" placeholder="Option List" required>
+                  <mat-option *ngFor="let optionList of optionLists" [value]="optionList.id">{{ optionList.displayName }}</mat-option>
+                </mat-select>
               </mat-form-field>
               <mat-form-field>
                 <input

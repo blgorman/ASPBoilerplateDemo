@@ -42,7 +42,7 @@ namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
                 var tenantId = AbpSession.TenantId; //is null if on host
 
                 var filteredResults = await _optionListItemRepository.GetAll()
-                                                    //.Include(x => x.OptionList)
+                                                    .Include(x => x.OptionList)
                                                     .WhereIf(!string.IsNullOrWhiteSpace(input.Filter),
                                                         oli => oli.DisplayText != null && oli.DisplayText.Contains(input.Filter
                                                                     , StringComparison.CurrentCultureIgnoreCase)

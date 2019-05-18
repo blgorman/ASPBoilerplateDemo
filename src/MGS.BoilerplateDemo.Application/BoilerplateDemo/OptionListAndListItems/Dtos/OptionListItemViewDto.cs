@@ -15,6 +15,8 @@ namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems.Dtos
         [JsonIgnore]
         public OptionListViewDto OptionList { get; set; } = new OptionListViewDto();
 
+        public string OptionListDisplayName => OptionList?.DisplayName;
+
         [Required]
         [MaxLength(OptionListItem.MaxItemDisplayTextLength)]
         public string DisplayText { get; set; }
