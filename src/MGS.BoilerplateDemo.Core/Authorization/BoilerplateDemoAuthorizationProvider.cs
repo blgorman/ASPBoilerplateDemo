@@ -36,6 +36,11 @@ namespace MGS.BoilerplateDemo.Authorization
             tenantOptionListItems.CreateChildPermission(PermissionNames.Pages_OptionListItems_Update, L("OptionListItemsUpdate"), multiTenancySides: MultiTenancySides.Tenant);
             tenantOptionListItems.CreateChildPermission(PermissionNames.Pages_OptionListItems_Delete, L("OptionListItemsDelete"), multiTenancySides: MultiTenancySides.Tenant);
 
+            var tenantContacts = pages.CreateChildPermission(PermissionNames.Pages_Contacts, L("Contacts"), multiTenancySides: MultiTenancySides.Tenant);
+            tenantContacts.CreateChildPermission(PermissionNames.Pages_Contacts_Create, L("ContactsCreate"), multiTenancySides: MultiTenancySides.Tenant);
+            tenantContacts.CreateChildPermission(PermissionNames.Pages_Contacts_Update, L("ContactsUpdate"), multiTenancySides: MultiTenancySides.Tenant);
+            tenantContacts.CreateChildPermission(PermissionNames.Pages_Contacts_Delete, L("ContactsDelete"), multiTenancySides: MultiTenancySides.Tenant);
+
         }
 
         private static ILocalizableString L(string name)

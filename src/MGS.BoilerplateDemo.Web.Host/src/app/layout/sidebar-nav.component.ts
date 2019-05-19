@@ -29,6 +29,7 @@ export class SideBarNavComponent extends AppComponentBase {
         ]),
 
         //Further menus can be added here as desired..
+        new MenuItem(this.l('ContactsMenu'), 'Pages.Contacts', 'people', '/app/contacts')
     ];
 
     constructor(

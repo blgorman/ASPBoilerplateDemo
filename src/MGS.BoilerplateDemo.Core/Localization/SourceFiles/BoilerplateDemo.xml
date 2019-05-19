@@ -127,5 +127,12 @@
     <text name="AdministrationMenu">Administration</text>
     <text name="OptionListsMenu">Option Lists</text>
     <text name="OptionListItemsMenu">Option List Items</text>
+    
+    <!-- Contacts -->
+    <text name="Contacts">Contacts</text>
+    <text name="ContactsCreate">Create Contacts</text>
+    <text name="ContactsUpdate">Update Contacts</text>
+    <text name="ContactsDelete">Delete Contacts</text>
+    <text name="ContactsMenu">Contacts</text>
   </texts>
 </localizationDictionary>
