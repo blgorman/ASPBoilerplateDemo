@@ -13,6 +13,12 @@
     <Compile Remove="Migrations\20190111071724_Upgraded_To_Abp_v4_1_0.cs" />
     <Compile Remove="Migrations\20190507051524_AddOptionListAndOptionListItemsEntities.cs" />
     <Compile Remove="Migrations\20190507051524_AddOptionListAndOptionListItemsEntities.Designer.cs" />
+    <Compile Remove="Migrations\20190519024739_Create Contact Object for Demo.cs" />
+    <Compile Remove="Migrations\20190519024739_Create Contact Object for Demo.Designer.cs" />
+    <Compile Remove="Migrations\20190519024847_Create Contact Object for Demo.cs" />
+    <Compile Remove="Migrations\20190519024847_Create Contact Object for Demo.Designer.cs" />
+    <Compile Remove="Migrations\20190519025356_Create Contact Object for Demo.cs" />
+    <Compile Remove="Migrations\20190519025356_Create Contact Object for Demo.Designer.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.1" />

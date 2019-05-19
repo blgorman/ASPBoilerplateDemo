@@ -35,5 +35,11 @@
         public const string Pages_OptionListItems_Create = "Pages.OptionListItems.Create";
         public const string Pages_OptionListItems_Update = "Pages.OptionListItems.Update";
         public const string Pages_OptionListItems_Delete = "Pages.OptionListItems.Delete";
+
+        //Contacts
+        public const string Pages_Contacts = "Pages.Contacts";
+        public const string Pages_Contacts_Create = "Pages.Contacts.Create";
+        public const string Pages_Contacts_Update = "Pages.Contacts.Update";
+        public const string Pages_Contacts_Delete = "Pages.Contacts.Delete";
     }
 }

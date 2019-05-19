@@ -53,6 +53,9 @@ import { HostEditOptionListDialogComponent } from './host/optionlists/edit/edit-
 import { HostOptionListItemsComponent } from './host/optionlistitems/optionlistitems.component';
 import { HostCreateOptionListItemsDialogComponent } from './host/optionlistitems/create/create-optionlistitems-dialog.component';
 import { HostEditOptionListItemsDialogComponent } from './host/optionlistitems/edit/edit-optionlistitems-dialog.component';
+import { ContactsComponent } from './contacts/contacts.component';
+import { EditContactDialogComponent } from './contacts/edit/edit-contact-dialog.component';
+import { CreateContactDialogComponent } from './contacts/create/create-contact-dialog.component';
 
 @NgModule({
   declarations: [
@@ -94,7 +97,11 @@ import { HostEditOptionListItemsDialogComponent } from './host/optionlistitems/e
     //host option list items
     HostOptionListItemsComponent,
     HostCreateOptionListItemsDialogComponent,
-    HostEditOptionListItemsDialogComponent
+    HostEditOptionListItemsDialogComponent,
+    //contacts
+    ContactsComponent,
+    EditContactDialogComponent,
+    CreateContactDialogComponent
   ],
   imports: [
     CommonModule,
@@ -136,7 +143,11 @@ import { HostEditOptionListItemsDialogComponent } from './host/optionlistitems/e
     //host option list items
     HostOptionListItemsComponent,
     HostCreateOptionListItemsDialogComponent,
-    HostEditOptionListItemsDialogComponent
+    HostEditOptionListItemsDialogComponent,
+    //contacts
+    ContactsComponent,
+    EditContactDialogComponent,
+    CreateContactDialogComponent
   ]
 })
 export class AppModule {}

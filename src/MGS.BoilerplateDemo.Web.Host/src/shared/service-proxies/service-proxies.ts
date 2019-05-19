@@ -204,6 +204,300 @@ export class ConfigurationServiceProxy {
 }
 
 @Injectable()
+export class ContactServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ? baseUrl : "";
+    }
+
+    /**
+     * @param input (optional) 
+     * @return Success
+     */
+    create(input: ContactCreateOrEditDto | null | undefined): Observable<ContactListViewDto> {
+        let url_ = this.baseUrl + "/api/services/app/Contact/Create";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(input);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreate(<any>response_);
+                } catch (e) {
+                    return <Observable<ContactListViewDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<ContactListViewDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processCreate(response: HttpResponseBase): Observable<ContactListViewDto> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 ? ContactListViewDto.fromJS(resultData200) : new ContactListViewDto();
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<ContactListViewDto>(<any>null);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    delete(id: number | null | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/Contact/Delete?";
+        if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&"; 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<void>(<any>null);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    get(id: number | null | undefined): Observable<ContactListViewDto> {
+        let url_ = this.baseUrl + "/api/services/app/Contact/Get?";
+        if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&"; 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGet(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGet(<any>response_);
+                } catch (e) {
+                    return <Observable<ContactListViewDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<ContactListViewDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGet(response: HttpResponseBase): Observable<ContactListViewDto> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 ? ContactListViewDto.fromJS(resultData200) : new ContactListViewDto();
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<ContactListViewDto>(<any>null);
+    }
+
+    /**
+     * @param filter (optional) 
+     * @param key (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getAll(filter: string | null | undefined, key: string | null | undefined, sorting: string | null | undefined, skipCount: number | null | undefined, maxResultCount: number | null | undefined): Observable<PagedResultDtoOfContactListViewDto> {
+        let url_ = this.baseUrl + "/api/services/app/Contact/GetAll?";
+        if (filter !== undefined)
+            url_ += "Filter=" + encodeURIComponent("" + filter) + "&"; 
+        if (key !== undefined)
+            url_ += "Key=" + encodeURIComponent("" + key) + "&"; 
+        if (sorting !== undefined)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&"; 
+        if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&"; 
+        if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&"; 
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAll(<any>response_);
+                } catch (e) {
+                    return <Observable<PagedResultDtoOfContactListViewDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<PagedResultDtoOfContactListViewDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<PagedResultDtoOfContactListViewDto> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 ? PagedResultDtoOfContactListViewDto.fromJS(resultData200) : new PagedResultDtoOfContactListViewDto();
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<PagedResultDtoOfContactListViewDto>(<any>null);
+    }
+
+    /**
+     * @param input (optional) 
+     * @return Success
+     */
+    update(input: ContactCreateOrEditDto | null | undefined): Observable<ContactListViewDto> {
+        let url_ = this.baseUrl + "/api/services/app/Contact/Update";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(input);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdate(<any>response_);
+                } catch (e) {
+                    return <Observable<ContactListViewDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<ContactListViewDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processUpdate(response: HttpResponseBase): Observable<ContactListViewDto> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 ? ContactListViewDto.fromJS(resultData200) : new ContactListViewDto();
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<ContactListViewDto>(<any>null);
+    }
+}
+
+@Injectable()
 export class OptionListServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -3400,6 +3694,318 @@ export interface IChangeUiThemeInput {
     theme: string;
 }
 
+export class ContactCreateOrEditDto implements IContactCreateOrEditDto {
+    firstName: string;
+    lastName: string;
+    email: string;
+    stateId: number;
+    tenantId: number | undefined;
+    isActive: boolean | undefined;
+    titleId: number | undefined;
+    id: number | undefined;
+
+    constructor(data?: IContactCreateOrEditDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.firstName = data["firstName"];
+            this.lastName = data["lastName"];
+            this.email = data["email"];
+            this.stateId = data["stateId"];
+            this.tenantId = data["tenantId"];
+            this.isActive = data["isActive"];
+            this.titleId = data["titleId"];
+            this.id = data["id"];
+        }
+    }
+
+    static fromJS(data: any): ContactCreateOrEditDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ContactCreateOrEditDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["firstName"] = this.firstName;
+        data["lastName"] = this.lastName;
+        data["email"] = this.email;
+        data["stateId"] = this.stateId;
+        data["tenantId"] = this.tenantId;
+        data["isActive"] = this.isActive;
+        data["titleId"] = this.titleId;
+        data["id"] = this.id;
+        return data; 
+    }
+
+    clone(): ContactCreateOrEditDto {
+        const json = this.toJSON();
+        let result = new ContactCreateOrEditDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IContactCreateOrEditDto {
+    firstName: string;
+    lastName: string;
+    email: string;
+    stateId: number;
+    tenantId: number | undefined;
+    isActive: boolean | undefined;
+    titleId: number | undefined;
+    id: number | undefined;
+}
+
+export class ContactListViewDto implements IContactListViewDto {
+    title: OptionListItemViewDto | undefined;
+    titleId: number | undefined;
+    titleDisplay: string | undefined;
+    firstName: string;
+    lastName: string;
+    email: string;
+    state: OptionListItemViewDto | undefined;
+    stateId: number;
+    stateDisplay: string | undefined;
+    tenantId: number;
+    isActive: boolean | undefined;
+    displayName: string | undefined;
+    id: number | undefined;
+
+    constructor(data?: IContactListViewDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.title = data["title"] ? OptionListItemViewDto.fromJS(data["title"]) : <any>undefined;
+            this.titleId = data["titleId"];
+            this.titleDisplay = data["titleDisplay"];
+            this.firstName = data["firstName"];
+            this.lastName = data["lastName"];
+            this.email = data["email"];
+            this.state = data["state"] ? OptionListItemViewDto.fromJS(data["state"]) : <any>undefined;
+            this.stateId = data["stateId"];
+            this.stateDisplay = data["stateDisplay"];
+            this.tenantId = data["tenantId"];
+            this.isActive = data["isActive"];
+            this.displayName = data["displayName"];
+            this.id = data["id"];
+        }
+    }
+
+    static fromJS(data: any): ContactListViewDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ContactListViewDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["title"] = this.title ? this.title.toJSON() : <any>undefined;
+        data["titleId"] = this.titleId;
+        data["titleDisplay"] = this.titleDisplay;
+        data["firstName"] = this.firstName;
+        data["lastName"] = this.lastName;
+        data["email"] = this.email;
+        data["state"] = this.state ? this.state.toJSON() : <any>undefined;
+        data["stateId"] = this.stateId;
+        data["stateDisplay"] = this.stateDisplay;
+        data["tenantId"] = this.tenantId;
+        data["isActive"] = this.isActive;
+        data["displayName"] = this.displayName;
+        data["id"] = this.id;
+        return data; 
+    }
+
+    clone(): ContactListViewDto {
+        const json = this.toJSON();
+        let result = new ContactListViewDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IContactListViewDto {
+    title: OptionListItemViewDto | undefined;
+    titleId: number | undefined;
+    titleDisplay: string | undefined;
+    firstName: string;
+    lastName: string;
+    email: string;
+    state: OptionListItemViewDto | undefined;
+    stateId: number;
+    stateDisplay: string | undefined;
+    tenantId: number;
+    isActive: boolean | undefined;
+    displayName: string | undefined;
+    id: number | undefined;
+}
+
+export class OptionListItemViewDto implements IOptionListItemViewDto {
+    optionListId: number | undefined;
+    optionListDisplayName: string | undefined;
+    displayText: string;
+    additionalInfo: string | undefined;
+    displayOrder: number | undefined;
+    isActive: boolean | undefined;
+    isDeleted: boolean | undefined;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment | undefined;
+    creatorUserId: number | undefined;
+    id: number | undefined;
+
+    constructor(data?: IOptionListItemViewDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.optionListId = data["optionListId"];
+            this.optionListDisplayName = data["optionListDisplayName"];
+            this.displayText = data["displayText"];
+            this.additionalInfo = data["additionalInfo"];
+            this.displayOrder = data["displayOrder"];
+            this.isActive = data["isActive"];
+            this.isDeleted = data["isDeleted"];
+            this.deleterUserId = data["deleterUserId"];
+            this.deletionTime = data["deletionTime"] ? moment(data["deletionTime"].toString()) : <any>undefined;
+            this.lastModificationTime = data["lastModificationTime"] ? moment(data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = data["lastModifierUserId"];
+            this.creationTime = data["creationTime"] ? moment(data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = data["creatorUserId"];
+            this.id = data["id"];
+        }
+    }
+
+    static fromJS(data: any): OptionListItemViewDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new OptionListItemViewDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["optionListId"] = this.optionListId;
+        data["optionListDisplayName"] = this.optionListDisplayName;
+        data["displayText"] = this.displayText;
+        data["additionalInfo"] = this.additionalInfo;
+        data["displayOrder"] = this.displayOrder;
+        data["isActive"] = this.isActive;
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data; 
+    }
+
+    clone(): OptionListItemViewDto {
+        const json = this.toJSON();
+        let result = new OptionListItemViewDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IOptionListItemViewDto {
+    optionListId: number | undefined;
+    optionListDisplayName: string | undefined;
+    displayText: string;
+    additionalInfo: string | undefined;
+    displayOrder: number | undefined;
+    isActive: boolean | undefined;
+    isDeleted: boolean | undefined;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment | undefined;
+    creatorUserId: number | undefined;
+    id: number | undefined;
+}
+
+export class PagedResultDtoOfContactListViewDto implements IPagedResultDtoOfContactListViewDto {
+    totalCount: number | undefined;
+    items: ContactListViewDto[] | undefined;
+
+    constructor(data?: IPagedResultDtoOfContactListViewDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.totalCount = data["totalCount"];
+            if (data["items"] && data["items"].constructor === Array) {
+                this.items = [];
+                for (let item of data["items"])
+                    this.items.push(ContactListViewDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): PagedResultDtoOfContactListViewDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PagedResultDtoOfContactListViewDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalCount"] = this.totalCount;
+        if (this.items && this.items.constructor === Array) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data; 
+    }
+
+    clone(): PagedResultDtoOfContactListViewDto {
+        const json = this.toJSON();
+        let result = new PagedResultDtoOfContactListViewDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IPagedResultDtoOfContactListViewDto {
+    totalCount: number | undefined;
+    items: ContactListViewDto[] | undefined;
+}
+
 export class PagedResultDtoOfOptionListViewDto implements IPagedResultDtoOfOptionListViewDto {
     totalCount: number | undefined;
     items: OptionListViewDto[] | undefined;
@@ -3548,101 +4154,6 @@ export interface IOptionListViewDto {
     isActive: boolean;
     tenantId: number | undefined;
     optionListItems: OptionListItemViewDto[] | undefined;
-    isDeleted: boolean | undefined;
-    deleterUserId: number | undefined;
-    deletionTime: moment.Moment | undefined;
-    lastModificationTime: moment.Moment | undefined;
-    lastModifierUserId: number | undefined;
-    creationTime: moment.Moment | undefined;
-    creatorUserId: number | undefined;
-    id: number | undefined;
-}
-
-export class OptionListItemViewDto implements IOptionListItemViewDto {
-    optionListId: number | undefined;
-    optionListDisplayName: string | undefined;
-    displayText: string;
-    additionalInfo: string | undefined;
-    displayOrder: number | undefined;
-    isActive: boolean | undefined;
-    isDeleted: boolean | undefined;
-    deleterUserId: number | undefined;
-    deletionTime: moment.Moment | undefined;
-    lastModificationTime: moment.Moment | undefined;
-    lastModifierUserId: number | undefined;
-    creationTime: moment.Moment | undefined;
-    creatorUserId: number | undefined;
-    id: number | undefined;
-
-    constructor(data?: IOptionListItemViewDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(data?: any) {
-        if (data) {
-            this.optionListId = data["optionListId"];
-            this.optionListDisplayName = data["optionListDisplayName"];
-            this.displayText = data["displayText"];
-            this.additionalInfo = data["additionalInfo"];
-            this.displayOrder = data["displayOrder"];
-            this.isActive = data["isActive"];
-            this.isDeleted = data["isDeleted"];
-            this.deleterUserId = data["deleterUserId"];
-            this.deletionTime = data["deletionTime"] ? moment(data["deletionTime"].toString()) : <any>undefined;
-            this.lastModificationTime = data["lastModificationTime"] ? moment(data["lastModificationTime"].toString()) : <any>undefined;
-            this.lastModifierUserId = data["lastModifierUserId"];
-            this.creationTime = data["creationTime"] ? moment(data["creationTime"].toString()) : <any>undefined;
-            this.creatorUserId = data["creatorUserId"];
-            this.id = data["id"];
-        }
-    }
-
-    static fromJS(data: any): OptionListItemViewDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new OptionListItemViewDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["optionListId"] = this.optionListId;
-        data["optionListDisplayName"] = this.optionListDisplayName;
-        data["displayText"] = this.displayText;
-        data["additionalInfo"] = this.additionalInfo;
-        data["displayOrder"] = this.displayOrder;
-        data["isActive"] = this.isActive;
-        data["isDeleted"] = this.isDeleted;
-        data["deleterUserId"] = this.deleterUserId;
-        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
-        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
-        data["lastModifierUserId"] = this.lastModifierUserId;
-        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
-        data["creatorUserId"] = this.creatorUserId;
-        data["id"] = this.id;
-        return data; 
-    }
-
-    clone(): OptionListItemViewDto {
-        const json = this.toJSON();
-        let result = new OptionListItemViewDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IOptionListItemViewDto {
-    optionListId: number | undefined;
-    optionListDisplayName: string | undefined;
-    displayText: string;
-    additionalInfo: string | undefined;
-    displayOrder: number | undefined;
-    isActive: boolean | undefined;
     isDeleted: boolean | undefined;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;

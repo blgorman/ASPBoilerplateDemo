@@ -11,6 +11,7 @@ import { OptionListItemsComponent } from './optionlistitems/optionlistitems.comp
 import { OptionListsComponent } from './optionlists/optionlists.component';
 import { HostOptionListsComponent } from './host/optionlists/hostoptionlists.component';
 import { HostOptionListItemsComponent } from './host/optionlistitems/optionlistitems.component';
+import { ContactsComponent } from './contacts/contacts.component';
 
 @NgModule({
     imports: [
@@ -28,6 +29,7 @@ import { HostOptionListItemsComponent } from './host/optionlistitems/optionlisti
                     { path: 'optionlistitems', component:OptionListItemsComponent, data: { permission: 'Pages.OptionListItems'}, canActivate: [AppRouteGuard] },
                     { path: 'host/optionlists', component: HostOptionListsComponent, data: { permission: 'Pages.Tenants.OptionLists'}, canActivate: [AppRouteGuard] },
                     { path: 'host/optionlistitems', component: HostOptionListItemsComponent, data: { permission: 'Pages.Tenants.OptionListItems'}, canActivate: [AppRouteGuard] },
+                    { path: 'contacts', component: ContactsComponent, data: { permission: 'Pages.Contacts' }, canActivate: [AppRouteGuard] }
                 ]
             }
         ])

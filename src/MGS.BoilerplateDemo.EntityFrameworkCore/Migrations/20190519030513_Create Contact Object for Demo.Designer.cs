@@ -4,14 +4,16 @@ using MGS.BoilerplateDemo.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace MGS.BoilerplateDemo.Migrations
 {
     [DbContext(typeof(BoilerplateDemoDbContext))]
-    partial class BoilerplateDemoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190519030513_Create Contact Object for Demo")]
+    partial class CreateContactObjectforDemo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
