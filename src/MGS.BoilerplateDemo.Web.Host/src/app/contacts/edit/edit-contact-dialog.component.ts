@@ -40,7 +40,7 @@ export class EditContactDialogComponent extends AppComponentBase implements OnIn
     }
 
     loadTitles(): void {
-        this._optionListItemService.getListItemsByListKey("", "Titles", "", 0, 1000)
+        this._optionListItemService.getListItemsByListKeyByTenant("", "Titles", "", 0, 1000)
             .pipe( finalize(() =>{this.loadContact();}))
             .subscribe((result: PagedResultDtoOfOptionListItemViewDto) => {
                 console.log("Titles");

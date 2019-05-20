@@ -39,7 +39,7 @@ export class CreateContactDialogComponent extends AppComponentBase implements On
     }
 
     loadTitles(): void {
-        this._optionListItemService.getListItemsByListKey("", "Titles", "", 0, 1000)
+        this._optionListItemService.getListItemsByListKeyByTenant("", "Titles", "", 0, 1000)
             .pipe( finalize(() =>{}))
             .subscribe((result: PagedResultDtoOfOptionListItemViewDto) => {
                 console.log("Titles");
