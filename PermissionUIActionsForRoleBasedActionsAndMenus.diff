@@ -1,0 +1,55 @@
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/contacts/contacts.component.html b/src/MGS.BoilerplateDemo.Web.Host/src/app/contacts/contacts.component.html
+index 95107a6..a166805 100644
+--- a/src/MGS.BoilerplateDemo.Web.Host/src/app/contacts/contacts.component.html
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/contacts/contacts.component.html
+@@ -33,7 +33,7 @@
+                 <th>
+                   <div style="text-align:center">{{ "IsActive" | localize }}</div>
+                 </th>
+-                <th>{{ "Actions" | localize }}</th>
++                <th *ngIf="permission.isGranted('Pages.Contacts.Update') || permission.isGranted('Pages.Contacts.Delete')">{{ "Actions" | localize }}</th>
+               </tr>
+             </thead>
+             <tbody>
+@@ -70,16 +70,16 @@
+                     indeterminate_check_box
+                   </i>
+                 </td>
+-                <td>
++                <td *ngIf="permission.isGranted('Pages.Contacts.Update') || permission.isGranted('Pages.Contacts.Delete')">
+                   <button class="action-button" mat-icon-button [matMenuTriggerFor]="actionsMenu">
+                     <mat-icon>menu</mat-icon>
+                   </button>
+                   <mat-menu #actionsMenu="matMenu">
+-                    <button mat-menu-item (click)="editContact(contact)">
++                    <button *ngIf="permission.isGranted('Pages.Contacts.Update')" mat-menu-item (click)="editContact(contact)">
+                       <mat-icon>edit</mat-icon>
+                       <span>{{ "Edit" | localize }}</span>
+                     </button>
+-                    <button mat-menu-item (click)="delete(contact)">
++                    <button *ngIf="permission.isGranted('Pages.Contacts.Delete')" mat-menu-item (click)="delete(contact)">
+                       <mat-icon>delete</mat-icon>
+                       <span>{{ "Delete" | localize }}</span>
+                     </button>
+@@ -98,7 +98,7 @@
+             >
+             </abp-pagination-controls>
+           </div>
+-          <button
++          <button *ngIf="permission.isGranted('Pages.Contacts.Create')"
+             mat-mini-fab
+             color="primary"
+             class="pull-right"
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/layout/sidebar-nav.component.ts b/src/MGS.BoilerplateDemo.Web.Host/src/app/layout/sidebar-nav.component.ts
+index 3ef34ce..90dc654 100644
+--- a/src/MGS.BoilerplateDemo.Web.Host/src/app/layout/sidebar-nav.component.ts
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/layout/sidebar-nav.component.ts
+@@ -23,7 +23,7 @@ export class SideBarNavComponent extends AppComponentBase {
+         ]),
+ 
+         // Option list administration at the tenant level
+-        new MenuItem(this.l("AdministrationMenu"), "Pages.OptionLists", "menu", "", [
++        new MenuItem(this.l("AdministrationMenu"), "Pages.OptionLists.Create", "menu", "", [
+             new MenuItem(this.l("OptionListsMenu"), "Pages.OptionLists", "", "optionlists"),
+             new MenuItem(this.l("OptionListItemsMenu"), "Pages.OptionListItems", "", "optionlistitems")
+         ]),
