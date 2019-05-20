@@ -1,0 +1,160 @@
+diff --git a/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/IOptionListItemsAppService.cs b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/IOptionListItemsAppService.cs
+index b4c0d36..c25aa97 100644
+--- a/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/IOptionListItemsAppService.cs
++++ b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/IOptionListItemsAppService.cs
+@@ -12,6 +12,7 @@ namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
+         Task<PagedResultDto<OptionListItemViewDto>> GetAllOptionListItems(GetOptionListItemDto input);
+ 
+         Task<PagedResultDto<OptionListItemViewDto>> GetListItemsByListKey(GetOptionListItemDto input);
++        Task<PagedResultDto<OptionListItemViewDto>> GetListItemsByListKeyByTenant(GetOptionListItemDto input);
+ 
+         Task<OptionListItemViewDto> GetListItemByEntityId(EntityDto input);
+ 
+diff --git a/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/OptionListItemsAppService.cs b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/OptionListItemsAppService.cs
+index 0e2c984..fd5fa8f 100644
+--- a/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/OptionListItemsAppService.cs
++++ b/src/MGS.BoilerplateDemo.Application/BoilerplateDemo/OptionListAndListItems/OptionListItemsAppService.cs
+@@ -103,6 +103,27 @@ namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
+             }
+         }
+ 
++        public async Task<PagedResultDto<OptionListItemViewDto>> GetListItemsByListKeyByTenant(GetOptionListItemDto input)
++        {
++            if (string.IsNullOrEmpty(input.Key) && string.IsNullOrEmpty(input.Filter)) return new PagedResultDto<OptionListItemViewDto>(0
++                            , new List<OptionListItemViewDto>());
++
++            var theList = await GetFirstMatchingOptionListByKey(new GetOptionListDto() { Key = input.Key });
++
++            if (theList != null && theList.OptionListItems != null && theList.OptionListItems.Any() && theList.TenantId == AbpSession.TenantId.Value)
++            {
++                var results = ObjectMapper.Map<List<OptionListItemViewDto>>(theList.OptionListItems);
++                return new PagedResultDto<OptionListItemViewDto>(
++                        results.Count
++                        , results
++                );
++            }
++
++            //return empty results:
++            return new PagedResultDto<OptionListItemViewDto>(0
++                        , new List<OptionListItemViewDto>());
++        }
++
+         [AbpAuthorize(PermissionNames.Pages_OptionListItems_Create, PermissionNames.Pages_Tenants_OptionListItems_Create,
+                         PermissionNames.Pages_OptionListItems_Update, PermissionNames.Pages_Tenants_OptionListItems_Update)]
+         public async Task CreateOrUpdateListItem(OptionListItemCreateOrEditDto input)
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/contacts/contacts.component.ts b/src/MGS.BoilerplateDemo.Web.Host/src/app/contacts/contacts.component.ts
+index 4f32cd1..c94cd93 100644
+--- a/src/MGS.BoilerplateDemo.Web.Host/src/app/contacts/contacts.component.ts
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/contacts/contacts.component.ts
+@@ -47,7 +47,7 @@ export class ContactsComponent extends PagedListingComponentBase<ContactListView
+     }
+ 
+     loadTitles(): void {
+-        this._optionListItemService.getListItemsByListKey("", "Titles", "", 0, 1000)
++        this._optionListItemService.getListItemsByListKeyByTenant("", "Titles", "", 0, 1000)
+             .pipe( finalize(() =>{}))
+             .subscribe((result: PagedResultDtoOfOptionListItemViewDto) => {
+                 this.titles = result.items;
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/contacts/create/create-contact-dialog.component.ts b/src/MGS.BoilerplateDemo.Web.Host/src/app/contacts/create/create-contact-dialog.component.ts
+index e46eb5a..56cc7d7 100644
+--- a/src/MGS.BoilerplateDemo.Web.Host/src/app/contacts/create/create-contact-dialog.component.ts
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/contacts/create/create-contact-dialog.component.ts
+@@ -39,7 +39,7 @@ export class CreateContactDialogComponent extends AppComponentBase implements On
+     }
+ 
+     loadTitles(): void {
+-        this._optionListItemService.getListItemsByListKey("", "Titles", "", 0, 1000)
++        this._optionListItemService.getListItemsByListKeyByTenant("", "Titles", "", 0, 1000)
+             .pipe( finalize(() =>{}))
+             .subscribe((result: PagedResultDtoOfOptionListItemViewDto) => {
+                 console.log("Titles");
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/app/contacts/edit/edit-contact-dialog.component.ts b/src/MGS.BoilerplateDemo.Web.Host/src/app/contacts/edit/edit-contact-dialog.component.ts
+index adce1d1..4c24959 100644
+--- a/src/MGS.BoilerplateDemo.Web.Host/src/app/contacts/edit/edit-contact-dialog.component.ts
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/app/contacts/edit/edit-contact-dialog.component.ts
+@@ -40,7 +40,7 @@ export class EditContactDialogComponent extends AppComponentBase implements OnIn
+     }
+ 
+     loadTitles(): void {
+-        this._optionListItemService.getListItemsByListKey("", "Titles", "", 0, 1000)
++        this._optionListItemService.getListItemsByListKeyByTenant("", "Titles", "", 0, 1000)
+             .pipe( finalize(() =>{this.loadContact();}))
+             .subscribe((result: PagedResultDtoOfOptionListItemViewDto) => {
+                 console.log("Titles");
+diff --git a/src/MGS.BoilerplateDemo.Web.Host/src/shared/service-proxies/service-proxies.ts b/src/MGS.BoilerplateDemo.Web.Host/src/shared/service-proxies/service-proxies.ts
+index 7e2db57..135f849 100644
+--- a/src/MGS.BoilerplateDemo.Web.Host/src/shared/service-proxies/service-proxies.ts
++++ b/src/MGS.BoilerplateDemo.Web.Host/src/shared/service-proxies/service-proxies.ts
+@@ -1484,6 +1484,72 @@ export class OptionListItemsServiceProxy {
+         return _observableOf<PagedResultDtoOfOptionListItemViewDto>(<any>null);
+     }
+ 
++    /**
++     * @param filter (optional) 
++     * @param key (optional) 
++     * @param sorting (optional) 
++     * @param skipCount (optional) 
++     * @param maxResultCount (optional) 
++     * @return Success
++     */
++    getListItemsByListKeyByTenant(filter: string | null | undefined, key: string | null | undefined, sorting: string | null | undefined, skipCount: number | null | undefined, maxResultCount: number | null | undefined): Observable<PagedResultDtoOfOptionListItemViewDto> {
++        let url_ = this.baseUrl + "/api/services/app/OptionListItems/GetListItemsByListKeyByTenant?";
++        if (filter !== undefined)
++            url_ += "Filter=" + encodeURIComponent("" + filter) + "&"; 
++        if (key !== undefined)
++            url_ += "Key=" + encodeURIComponent("" + key) + "&"; 
++        if (sorting !== undefined)
++            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&"; 
++        if (skipCount !== undefined)
++            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&"; 
++        if (maxResultCount !== undefined)
++            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&"; 
++        url_ = url_.replace(/[?&]$/, "");
++
++        let options_ : any = {
++            observe: "response",
++            responseType: "blob",
++            headers: new HttpHeaders({
++                "Accept": "application/json"
++            })
++        };
++
++        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
++            return this.processGetListItemsByListKeyByTenant(response_);
++        })).pipe(_observableCatch((response_: any) => {
++            if (response_ instanceof HttpResponseBase) {
++                try {
++                    return this.processGetListItemsByListKeyByTenant(<any>response_);
++                } catch (e) {
++                    return <Observable<PagedResultDtoOfOptionListItemViewDto>><any>_observableThrow(e);
++                }
++            } else
++                return <Observable<PagedResultDtoOfOptionListItemViewDto>><any>_observableThrow(response_);
++        }));
++    }
++
++    protected processGetListItemsByListKeyByTenant(response: HttpResponseBase): Observable<PagedResultDtoOfOptionListItemViewDto> {
++        const status = response.status;
++        const responseBlob = 
++            response instanceof HttpResponse ? response.body : 
++            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
++
++        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
++        if (status === 200) {
++            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
++            let result200: any = null;
++            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
++            result200 = resultData200 ? PagedResultDtoOfOptionListItemViewDto.fromJS(resultData200) : new PagedResultDtoOfOptionListItemViewDto();
++            return _observableOf(result200);
++            }));
++        } else if (status !== 200 && status !== 204) {
++            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
++            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
++            }));
++        }
++        return _observableOf<PagedResultDtoOfOptionListItemViewDto>(<any>null);
++    }
++
+     /**
+      * @param input (optional) 
+      * @return Success

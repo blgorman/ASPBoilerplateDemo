@@ -12,6 +12,7 @@ namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
         Task<PagedResultDto<OptionListItemViewDto>> GetAllOptionListItems(GetOptionListItemDto input);
 
         Task<PagedResultDto<OptionListItemViewDto>> GetListItemsByListKey(GetOptionListItemDto input);
+        Task<PagedResultDto<OptionListItemViewDto>> GetListItemsByListKeyByTenant(GetOptionListItemDto input);
 
         Task<OptionListItemViewDto> GetListItemByEntityId(EntityDto input);
 

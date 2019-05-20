@@ -103,6 +103,27 @@ namespace MGS.BoilerplateDemo.BoilerplateDemo.OptionListAndListItems
             }
         }
 
+        public async Task<PagedResultDto<OptionListItemViewDto>> GetListItemsByListKeyByTenant(GetOptionListItemDto input)
+        {
+            if (string.IsNullOrEmpty(input.Key) && string.IsNullOrEmpty(input.Filter)) return new PagedResultDto<OptionListItemViewDto>(0
+                            , new List<OptionListItemViewDto>());
+
+            var theList = await GetFirstMatchingOptionListByKey(new GetOptionListDto() { Key = input.Key });
+
+            if (theList != null && theList.OptionListItems != null && theList.OptionListItems.Any() && theList.TenantId == AbpSession.TenantId.Value)
+            {
+                var results = ObjectMapper.Map<List<OptionListItemViewDto>>(theList.OptionListItems);
+                return new PagedResultDto<OptionListItemViewDto>(
+                        results.Count
+                        , results
+                );
+            }
+
+            //return empty results:
+            return new PagedResultDto<OptionListItemViewDto>(0
+                        , new List<OptionListItemViewDto>());
+        }
+
         [AbpAuthorize(PermissionNames.Pages_OptionListItems_Create, PermissionNames.Pages_Tenants_OptionListItems_Create,
                         PermissionNames.Pages_OptionListItems_Update, PermissionNames.Pages_Tenants_OptionListItems_Update)]
         public async Task CreateOrUpdateListItem(OptionListItemCreateOrEditDto input)
