@@ -23,7 +23,7 @@ export class SideBarNavComponent extends AppComponentBase {
         ]),
 
         // Option list administration at the tenant level
-        new MenuItem(this.l("AdministrationMenu"), "Pages.OptionLists", "menu", "", [
+        new MenuItem(this.l("AdministrationMenu"), "Pages.OptionLists.Create", "menu", "", [
             new MenuItem(this.l("OptionListsMenu"), "Pages.OptionLists", "", "optionlists"),
             new MenuItem(this.l("OptionListItemsMenu"), "Pages.OptionListItems", "", "optionlistitems")
         ]),
