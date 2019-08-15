@@ -13,7 +13,6 @@ namespace MGS.BoilerplateDemo.EntityFrameworkCore
         /* Define a DbSet for each entity of the application */
         public virtual DbSet<OptionList> OptionLists { get; set; }
         public virtual DbSet<OptionListItem> OptionListItems { get; set; }
-
         public virtual DbSet<Contact> Contacts { get; set; }
 
         public BoilerplateDemoDbContext(DbContextOptions<BoilerplateDemoDbContext> options)
